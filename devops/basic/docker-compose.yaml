@@ -1,0 +1,58 @@
+version: "3.7"
+
+# użyty do postawienia podstawowej bazy danych z prostą konsolą adminera do edycji danych
+# docker-compose -f docker-compose.yaml up -d
+#
+
+services:
+
+  db:
+    image: postgres:15.1-alpine3.17
+    ports:
+      - "5432:5432"
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 200M
+
+      restart_policy:
+        condition: on-failure
+
+    environment:
+      POSTGRES_PASSWORD: wsiz1234
+
+    networks:
+      - net1
+
+  adminer:
+    image: adminer
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 100M
+
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "8811:8080"
+
+    networks:
+      - net1
+
+  pgweb:
+    image: sosedoff/pgweb:0.14.0
+    restart: unless-stopped
+    ports:
+      - "8084:8081"
+    environment:
+      - PGWEB_DATABASE_URL=postgres://postgres:wsiz1234@db:5432/postgres?sslmode=disable
+    networks:
+      - net1
+
+
+networks:
+  net1:
