@@ -19,6 +19,10 @@ create table securedresource(
 insert into securedresource(name) values ('sala 12');
 insert into securedresource(name) values ('sala 05');
 
+
+-- STEP 4
+
+-- upgrade
 create table securitygroup(
     groupid int not null,
     keyid int references accesskey(keyid),
@@ -26,6 +30,10 @@ create table securitygroup(
 );
 alter table securitygroup add constraint pk_group primary key (keyid, resourceid);
 
+-- downgrade
 drop table securitygroup;
+
+
+
 
 insert into securitygroup(groupid, keyid, resourceid) values (2, 5, 1);
