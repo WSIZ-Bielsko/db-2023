@@ -10,10 +10,12 @@ load_dotenv()
 URL = getenv('DATABASE_URL')
 SCHEMA = getenv('SCHEMA')
 
+
 class DbService:
 
     async def initialize(self):
-        self.pool = await asyncpg.create_pool(URL, timeout=30, command_timeout=5, server_settings={'search_path': SCHEMA})
+        self.pool = await asyncpg.create_pool(URL, timeout=30, command_timeout=5,
+                                              server_settings={'search_path': SCHEMA})
 
         print('connected!')
 
@@ -32,8 +34,8 @@ class DbService:
 
 async def main():
     db = DbService()
-    await db.initialize()
-    users = await db.get_users()
+    await db.initialize()  # tu łączymy się z bazą danych
+    users = await db.get_users()  # tu pobieramy dane z bazy danych
     print(users)
     await sleep(1)
 
