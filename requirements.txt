@@ -1,3 +1,5 @@
 alembic
-dotenv
+python-dotenv
 psycopg2
+loguru
+asyncpg

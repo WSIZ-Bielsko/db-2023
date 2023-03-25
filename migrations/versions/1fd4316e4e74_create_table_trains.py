@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade() -> None:
     op.execute(
-        """--sql
+        f"""--sql
         CREATE TABLE trains(
             trainid UUID DEFAULT gen_random_uuid() PRIMARY KEY,
             active BOOL DEFAULT false
@@ -29,7 +29,7 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.execute(
-        """--sql
+        f"""--sql
         DROP TABLE trains;
         """
     )
