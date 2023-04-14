@@ -18,4 +18,3 @@ for i, c in enumerate(crews):
 w = json.loads(crews[0])    # list[dict]
 for item in w:
     print(CrewEntry(movie_index=0,**item))
- 

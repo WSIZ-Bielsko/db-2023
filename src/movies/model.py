@@ -26,4 +26,3 @@ class CrewEntry:
     id: int  # id of ... the person?
     job: str
     name: str
- 
