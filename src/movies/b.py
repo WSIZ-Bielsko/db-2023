@@ -2,17 +2,19 @@ import json
 
 import pandas as pd
 
-from movies.model import CastEntry
+from movies.model import *
 
 pd.options.display.max_rows = 6
 
 df = pd.read_csv('data/tmdb_5000_credits.csv')
 
-# print(df.head())
-print(df['cast'])
 
-casts = [x for x in df['cast']]
-print(type(casts[0]))  # str
-w = json.loads(casts[0])    # list[dict]
-for cs in w:
-    print(CastEntry(**cs))
+crews = [x for x in df['crew']]
+# print(type(crews[0]))  # str
+
+for i, c in enumerate(crews):
+    print(f'movie_position: {i}, data: {c[:60]}')
+
+w = json.loads(crews[0])    # list[dict]
+for item in w:
+    print(CrewEntry(movie_index=0,**item))
