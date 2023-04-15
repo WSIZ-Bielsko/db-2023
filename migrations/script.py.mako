@@ -17,7 +17,7 @@ depends_on = ${repr(depends_on)}
 
 
 def upgrade() -> None:
-    ${upgrades if upgrades else ""}
+    ${upgrades if upgrades else "pass"}
 
 
 def downgrade() -> None:

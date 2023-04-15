@@ -30,20 +30,20 @@ def upgrade() -> None:
 
     CREATE TABLE movie(
         movie_id SERIAL PRIMARY KEY,
-        budget INT,
+        budget BIGINT,
         english_title TEXT,
         homepage TEXT,
-        original_language TEXT REFERENCES language(iso_639_1),
+        original_language TEXT REFERENCES language(iso_639_1) ON DELETE CASCADE ,
         original_title TEXT,
         overview TEXT,
         popularity DOUBLE PRECISION,
         release_date DATE,
-        revenue INT,
+        revenue BIGINT,
         runtime INT,
         status INT REFERENCES status(status_id) ON DELETE CASCADE,
         tagline TEXT,
         vote_average FLOAT,
-        vote_count INT
+        vote_count BIGINT
     );
 
     CREATE TABLE department(

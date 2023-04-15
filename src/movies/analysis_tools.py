@@ -70,7 +70,7 @@ def find_duplicates(casts: list[str]):
             print('name->ids ', k, v)
 
 if __name__ == '__main__':
-    df = pd.read_csv('data/tmdb_5000_credits.csv')
+    df = pd.read_csv('../../migrations/data/tmdb_5000_credits.csv')
     casts_ = list(df['cast'])  # list[str]
     # check_unique_cast_creditid(casts_)
     check_assignment_actor_actorid(casts_)

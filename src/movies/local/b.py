@@ -3,7 +3,7 @@ import pandas as pd
 from model import *
 
 pd.options.display.max_rows = 6
-df = pd.read_csv('../data/tmdb_5000_credits.csv')
+df = pd.read_csv('../../../migrations/data/tmdb_5000_credits.csv')
 crews = [x for x in df['crew']]
 employees, ids = {}, {}
 for crew in crews:
