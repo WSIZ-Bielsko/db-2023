@@ -6,7 +6,7 @@ Revision ID: f7f8d9d25ab9
 Creation date: 2023-04-15 15:02:56.786352
 
 """
-from alembic import op, context
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = 'f7f8d9d25ab9'

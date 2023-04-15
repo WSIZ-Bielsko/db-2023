@@ -4,7 +4,7 @@ from model import CastEntry
 
 
 pd.options.display.max_rows = 10
-df = pd.read_csv('../data/tmdb_5000_credits.csv')
+df = pd.read_csv('../../../migrations/data/tmdb_5000_credits.csv')
 
 casts = [x for x in df['cast']]  # lista wartości w kolumnie 'casts'
 actors, ids = {}, {}
