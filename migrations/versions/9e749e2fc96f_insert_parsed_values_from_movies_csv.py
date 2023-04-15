@@ -112,7 +112,3 @@ def downgrade() -> None:
     DELETE FROM country;
     DELETE FROM language;
     """)
-
-
-if __name__ == '__main__':
-    print(set(mv['original_language']))
