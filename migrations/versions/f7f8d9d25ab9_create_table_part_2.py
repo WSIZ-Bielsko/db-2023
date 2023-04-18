@@ -65,7 +65,7 @@ CREATE TABLE movie_keyword(
     keyword_id INT REFERENCES keyword(keyword_id) ON DELETE CASCADE
 );
 
-CREATE TABLE movie_languages(
+CREATE TABLE movie_language(
     movie_id INT REFERENCES movie(movie_id) ON DELETE CASCADE,
     language_id TEXT REFERENCES language(iso_639_1) ON DELETE CASCADE
 );
@@ -83,5 +83,5 @@ DROP TABLE IF EXISTS movie_cast CASCADE;
 DROP TABLE IF EXISTS movie_crew CASCADE;
 DROP TABLE IF EXISTS movie_keyword CASCADE;
 DROP TABLE IF EXISTS movie_genre CASCADE;
-DROP TABLE IF EXISTS movie_languages CASCADE;
+DROP TABLE IF EXISTS movie_language CASCADE;
     """)
