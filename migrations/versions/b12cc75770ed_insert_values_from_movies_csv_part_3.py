@@ -21,7 +21,7 @@ mv = read_csv('/home/user/Projects/db/migrations/data/tmdb_5000_movies.csv')
 
 def upgrade() -> None:
     from json import loads
-    column_args = [('spoken_languages', 'language'), ('production_countries', 'country'), ('genres', 'genre'), ('keywords', 'keyword'), ('production_companies', 'company')]
+    column_args = [('production_companies', 'company'), ('spoken_languages', 'language'), ('production_countries', 'country'), ('genres', 'genre'), ('keywords', 'keyword')]
     for column, table in column_args:
         zipped = list(zip(mv['id'], mv[column]))
         for movie_id, elements in zipped:

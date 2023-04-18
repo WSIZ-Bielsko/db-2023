@@ -19,17 +19,17 @@ def upgrade() -> None:
     op.execute("""
 CREATE TABLE company(
     company_id SERIAL PRIMARY KEY,
-    company_name TEXT NOT NULL UNIQUE
+    company_name TEXT NOT NULL
 );
 
 CREATE TABLE country(
     iso_3166_1 TEXT PRIMARY KEY,
-    country_name TEXT NOT NULL UNIQUE
+    country_name TEXT NOT NULL
 );
 
 CREATE TABLE keyword(
     keyword_id SERIAL PRIMARY KEY,
-    keyword_name TEXT NOT NULL UNIQUE
+    keyword_name TEXT NOT NULL
 );
 
 CREATE TABLE movie_company(
