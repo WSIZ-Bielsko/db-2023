@@ -46,8 +46,9 @@ def fix_text(text: str) -> str: return text.replace("'", "’").replace(' :', ':
 def upgrade() -> None:
     from json import loads
     int_f, text = ['budget', 'revenue', 'runtime'], ['homepage', 'original_title', 'overview', 'tagline', 'title']
-    column_args = [('production_countries', 'country'), ('spoken_languages', 'language'), ('genres', 'genre'),
-                   ('keywords', 'keyword'), ('production_companies', 'company')]
+    spoken = [y['iso_639_1'] for x in mv['spoken_languages'] for y in loads(x)]
+    for x in mv['original_language']:
+        if x not in spoken: op.execute(f"INSERT INTO language VALUES ('{x}', '???')")
     for i in mv.T:
         values = {prop: mv[prop][i] for prop in list(Movie.__annotations__.keys())}
         movie = Movie(**values)
@@ -59,21 +60,7 @@ def upgrade() -> None:
             if isinstance(movie.__getattribute__(field), float): movie.__setattr__(field, 0)
         if isinstance(movie.release_date, float): movie.release_date = "1-1-1"
         op.execute(f'INSERT INTO movie VALUES {tuple(movie.__dict__.values())}')
-    for column, table in column_args:
-        zipped = list(zip(mv['id'], mv[column]))
-        for movie_id, elements in zipped:
-            element_ids = [list(x.values())[1 if table == 'company' else 0] for x in loads(elements)]
-            for element_id in element_ids:
-                element_id = element_id if isinstance(element_id, int) else element_id.lower()
-                op.execute(f'INSERT INTO movie_{table} VALUES {(movie_id, element_id)}')
 
 
 def downgrade() -> None:
-    op.execute("""
-    DELETE FROM movie;
-    DELETE FROM movie_company;
-    DELETE FROM movie_country;
-    DELETE FROM movie_genre;
-    DELETE FROM movie_keyword;
-    DELETE FROM movie_language;
-    """)
+    op.execute('DELETE FROM movie;')
