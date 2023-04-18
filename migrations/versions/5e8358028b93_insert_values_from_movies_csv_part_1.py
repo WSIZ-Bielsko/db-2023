@@ -57,7 +57,7 @@ def parse_json_columns(column_name: str, object_class):
             obj = object_class(**y)
             if object_class == Country: obj.iso_3166_1 = obj.iso_3166_1.lower()
             obj.name = fix_text(obj.name)
-            val = obj.iso_639alem_1 if object_class == Language else obj.name
+            val = obj.iso_639_1 if object_class == Language else (obj.iso_3166_1 if object_class == Country else obj.id)
             if val not in vals:
                 vals.append(val)
                 op.execute(f'INSERT INTO {object_class.__name__.lower()} VALUES {tuple(obj.__dict__.values())}')
