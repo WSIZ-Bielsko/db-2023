@@ -67,11 +67,12 @@ def upgrade() -> None:
     );
 
     CREATE TABLE crew(
-        credit_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+        crew_id SERIAL PRIMARY KEY,
         department UUID REFERENCES department(department_id) ON DELETE CASCADE,
         gender INT REFERENCES gender(gender_id) ON DELETE CASCADE,
         job UUID REFERENCES job(job_id) ON DELETE CASCADE,
-        name TEXT NOT NULL
+        name TEXT NOT NULL,
+        credit_id TEXT NOT NULL
     );
         """)
 

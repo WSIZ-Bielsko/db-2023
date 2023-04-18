@@ -8,7 +8,6 @@ Creation date: 2023-04-18 16:49:31.719249
 """
 from alembic import op
 from pandas import read_csv
-from sqlalchemy import Table
 
 # revision identifiers, used by Alembic.
 revision = 'b12cc75770ed'
