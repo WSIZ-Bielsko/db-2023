@@ -11,6 +11,7 @@ from alembic import op
 from dataclasses import dataclass
 from json import loads
 
+
 status_ar = ['Released', 'Post Production', 'Rumored']
 mv = read_csv('/home/user/Projects/db/migrations/data/tmdb_5000_movies.csv')
 
@@ -50,14 +51,15 @@ def fix_text(text: str) -> str: return text.replace("'", "’").replace(' :', ':
 
 
 def parse_json_columns(column_name: str, object_class):
-    names = []
+    vals = []
     for x in mv[column_name]:
         for y in loads(x):
             obj = object_class(**y)
             if object_class == Country: obj.iso_3166_1 = obj.iso_3166_1.lower()
             obj.name = fix_text(obj.name)
-            if obj.name not in names:
-                names.append(obj.name)
+            val = obj.iso_639alem_1 if object_class == Language else obj.name
+            if val not in vals:
+                vals.append(val)
                 op.execute(f'INSERT INTO {object_class.__name__.lower()} VALUES {tuple(obj.__dict__.values())}')
 
 
@@ -65,9 +67,6 @@ def upgrade() -> None:
     column_args = [('production_countries', Country), ('spoken_languages', Language), ('genres', Genre), ('production_companies', Company), ('keywords', Keyword)]
     for index, status in enumerate(status_ar): op.execute(f"INSERT INTO status VALUES ({index}, '{status}')")
     for args in column_args: parse_json_columns(*args)
-    spoken = [lang['iso_639_1'] for js in mv['spoken_languages'] for lang in loads(js)]
-    for language in mv['original_language']:
-        if language not in spoken: op.execute(f"INSERT INTO language VALUES ('{language}', '???')")
 
 
 def downgrade() -> None:

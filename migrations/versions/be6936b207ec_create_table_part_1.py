@@ -20,7 +20,7 @@ def upgrade() -> None:
     op.execute("""
     CREATE TABLE language(
         iso_639_1 TEXT PRIMARY KEY,
-        language_name TEXT NOT NULL UNIQUE
+        language_name TEXT NOT NULL
     );
 
     CREATE TABLE status(
