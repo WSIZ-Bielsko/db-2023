@@ -41,13 +41,13 @@ CREATE TABLE movie_cast(
     cast_id SERIAL PRIMARY KEY,
     character TEXT NOT NULL UNIQUE,
     movie_id INT REFERENCES movie(movie_id) ON DELETE CASCADE,
-    crew_id UUID REFERENCES crew(credit_id) ON DELETE CASCADE,
+    crew_id INT REFERENCES crew(crew_id) ON DELETE CASCADE,
     credit_order INT
 );
 
 CREATE TABLE movie_crew(
     movie_id INT REFERENCES movie(movie_id) ON DELETE CASCADE,
-    crew_id UUID REFERENCES crew(credit_id) ON DELETE CASCADE
+    crew_id INT REFERENCES crew(crew_id) ON DELETE CASCADE
 );
 
 CREATE TABLE movie_country(
