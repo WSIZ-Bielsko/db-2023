@@ -131,3 +131,23 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /migrations/data/
+/backup/actor.sql
+/backup/alembic_version.sql
+/backup/company.sql
+/backup/country.sql
+/backup/crew.sql
+/backup/department.sql
+/backup/gender.sql
+/backup/genre.sql
+/backup/job.sql
+/backup/keyword.sql
+/backup/language.sql
+/backup/movie.sql
+/backup/movie_cast.sql
+/backup/movie_company.sql
+/backup/movie_country.sql
+/backup/movie_crew.sql
+/backup/movie_genre.sql
+/backup/movie_keyword.sql
+/backup/movie_language.sql
+/backup/status.sql

@@ -25,7 +25,7 @@ def upgrade() -> None:
 
     CREATE TABLE status(
         status_id SERIAL PRIMARY KEY,
-        status_name TEXT NOT NULL UNIQUE
+        status_name TEXT NOT NULL
     );
 
     CREATE TABLE movie(
@@ -48,22 +48,22 @@ def upgrade() -> None:
 
     CREATE TABLE department(
         department_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-        department_name TEXT NOT NULL UNIQUE
+        department_name TEXT NOT NULL
     );
 
     CREATE TABLE gender(
         gender_id SERIAL PRIMARY KEY,
-        gender_name TEXT NOT NULL UNIQUE
+        gender_name TEXT NOT NULL
     );
 
     CREATE TABLE genre(
         genre_id SERIAL PRIMARY KEY,
-        genre_name TEXT NOT NULL UNIQUE
+        genre_name TEXT NOT NULL
     );
 
     CREATE TABLE job(
         job_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-        job_name TEXT NOT NULL UNIQUE
+        job_name TEXT NOT NULL
     );
 
     CREATE TABLE crew(
@@ -71,7 +71,7 @@ def upgrade() -> None:
         department UUID REFERENCES department(department_id) ON DELETE CASCADE,
         gender INT REFERENCES gender(gender_id) ON DELETE CASCADE,
         job UUID REFERENCES job(job_id) ON DELETE CASCADE,
-        name TEXT NOT NULL UNIQUE
+        name TEXT NOT NULL
     );
         """)
 
