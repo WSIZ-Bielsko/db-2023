@@ -1,9 +1,9 @@
 """
 
-insert values from credits.csv
+insert values from credits.csv part 1
 
-Revision ID: 1f7c56e6824f
-Creation date: 2023-04-18 21:58:47.322059
+Revision ID: 2bcd2bba1262
+Creation date: 2023-04-19 01:06:31.694259
 
 """
 from pandas import read_csv
@@ -14,27 +14,16 @@ from uuid import UUID, uuid4
 
 @dataclass
 class Crew:
-    credit_id: UUID
+    id: int
     department: UUID
     gender: int
     job: UUID
     name: str
-    id: int
-
-
-@dataclass
-class Cast:
-    cast_id: int
-    character: str
     credit_id: str
-    gender: int
-    id: int
-    name: str
-    order: int
 
 
 # revision identifiers, used by Alembic.
-revision = '1f7c56e6824f'
+revision = '2bcd2bba1262'
 down_revision = 'b12cc75770ed'
 branch_labels = None
 depends_on = None
@@ -42,11 +31,14 @@ depends_on = None
 cr = read_csv('/home/user/Projects/db/migrations/data/tmdb_5000_credits.csv')
 
 
+def fix_text(text: str) -> str: return text.replace("'", "’")
+
+
 def check_value(obj, field: str, table: dict):
     name = obj.__getattribute__(field)
     if name not in table:
         uuid = generate_random_uuid(table)
-        op.execute(f"INSERT INTO {field} VALUES ('{uuid}', '{name}')")
+        op.execute(f"INSERT INTO {field} VALUES ('{uuid}', '{fix_text(name)}')")
         table[name] = uuid
         obj.__setattr__(field, uuid)
     else: obj.__setattr__(field, table[name])
@@ -63,25 +55,14 @@ def upgrade() -> None:
     for index, gender in enumerate(genders): op.execute(f"INSERT INTO gender VALUES ({index}, '{gender}')")
     from json import loads
     departments, jobs, ids = {}, {}, []
-    for index, crews in enumerate(cr['crew']):
-        movie_id = cr['movie_id'][index]
+    for crews in cr['crew']:
         for crew in loads(crews):
             c = Crew(**crew)
             if c.id not in ids:
                 ids.append(c.id)
                 check_value(c, 'department', departments)
                 check_value(c, 'job', jobs)
-                c.name = c.name.replace("'", "\"")
-                op.execute(f"INSERT INTO crew VALUES ('{c.id}', '{c.department}', {c.gender}, '{c.job}', '{c.name}')")
-                op.execute(f"INSERT INTO movie_crew VALUES ({movie_id}, '{c.id}')")
-    ids.clear()
-    for index, casts in enumerate(cr['cast']):
-        movie_id = cr['movie_id'][index]
-        for cast in loads(casts):
-            c = Cast(**cast)
-            if c.id not in ids:
-                ids.append(c.id)
-                op.execute(f"INSERT INTO movie_cast VALUES ({c.cast_id}, {c.name}, {movie_id}, {c.id}, {c.order})")
+                op.execute(f"INSERT INTO crew VALUES ('{c.id}', '{c.department}', {c.gender}, '{c.job}', '{fix_text(c.name)}', '{c.credit_id}')")
 
 
 def downgrade() -> None:
@@ -90,6 +71,4 @@ def downgrade() -> None:
     DELETE FROM department;
     DELETE FROM job;
     DELETE FROM crew;
-    DELETE FROM movie_cast;
-    DELETE FROM movie_crew;
     """)

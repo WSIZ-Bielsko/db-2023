@@ -71,7 +71,8 @@ def upgrade() -> None:
         department UUID REFERENCES department(department_id) ON DELETE CASCADE,
         gender INT REFERENCES gender(gender_id) ON DELETE CASCADE,
         job UUID REFERENCES job(job_id) ON DELETE CASCADE,
-        name TEXT NOT NULL
+        name TEXT NOT NULL,
+        credit_id TEXT NOT NULL
     );
         """)
 
