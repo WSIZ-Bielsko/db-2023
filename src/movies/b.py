@@ -2,7 +2,7 @@ import json
 
 import pandas as pd
 
-from movies.model import *
+from model import *
 
 pd.options.display.max_rows = 6
 

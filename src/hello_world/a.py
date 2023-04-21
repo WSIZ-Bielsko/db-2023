@@ -4,7 +4,7 @@ import asyncpg
 from dotenv import load_dotenv
 from os import getenv
 
-from hello_world.model import User
+from model import User
 
 load_dotenv()
 URL = getenv('DATABASE_URL')

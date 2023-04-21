@@ -1,6 +1,6 @@
 alembic
 python-dotenv
-psycopg2
+psycopg2-binary
 loguru
 asyncpg
 pandas
