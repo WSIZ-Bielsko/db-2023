@@ -1,9 +1,10 @@
 import json
 from collections import defaultdict
+from collections.abc import Iterable
 
 import pandas as pd
 
-from model import CastEntry, CrewEntry
+from model import *
 
 pd.options.display.max_rows = 10
 
@@ -15,6 +16,7 @@ def get_cast_of_movie(index: int, cast_field: str) -> list[CastEntry]:
         entry = CastEntry(movie_index=index, **d)
         entries.append(entry)
     return entries
+
 
 def get_crew_of_movie(index: int, crew_field: str) -> list[CrewEntry]:
     dicts = json.loads(crew_field)
@@ -34,6 +36,7 @@ def check_unique_cast_creditid(casts: list[str]):
     unique = (len(credit_ids) == len(set(credit_ids)))
     print(f'{unique=}')
 
+
 def check_unique_crew_creditid(casts: list[str]):
     credit_ids = []
     for i, movie in enumerate(casts):
@@ -42,6 +45,7 @@ def check_unique_crew_creditid(casts: list[str]):
 
     unique = (len(credit_ids) == len(set(credit_ids)))
     print(f'{unique=}')
+
 
 def check_assignment_actor_actorid(casts: list[str]):
     name_id_pairs = []
@@ -68,22 +72,23 @@ def find_duplicates(casts: list[str]):
         name_id_pairs.extend([(c.id, c.name) for c in entries])
 
     unique_pairs = set(name_id_pairs)
-    id_to_name = defaultdict(lambda : set())
-    for (id,name) in unique_pairs:
+    id_to_name = defaultdict(lambda: set())
+    for (id, name) in unique_pairs:
         id_to_name[id].add(name)
 
-    for (k,v) in id_to_name.items():
+    for (k, v) in id_to_name.items():
         if len(v) > 1:
             print('id->names ', k, v)
 
     # -----
-    name_to_id = defaultdict(lambda : set())
-    for (id,name) in unique_pairs:
+    name_to_id = defaultdict(lambda: set())
+    for (id, name) in unique_pairs:
         name_to_id[name].add(id)
 
-    for (k,v) in name_to_id.items():
+    for (k, v) in name_to_id.items():
         if len(v) > 4:
             print('name->ids ', k, v)
+
 
 def find_duplicates_crew(crews: list[str]):
     name_id_pairs = []
@@ -92,22 +97,44 @@ def find_duplicates_crew(crews: list[str]):
         name_id_pairs.extend([(c.id, c.name) for c in entries])
 
     unique_pairs = set(name_id_pairs)
-    id_to_name = defaultdict(lambda : set())
-    for (id,name) in unique_pairs:
+    id_to_name = defaultdict(lambda: set())
+    for (id, name) in unique_pairs:
         id_to_name[id].add(name)
 
-    for (k,v) in id_to_name.items():
+    for (k, v) in id_to_name.items():
         if len(v) > 1:
             print('id->names ', k, v)
 
     # -----
-    name_to_id = defaultdict(lambda : set())
-    for (id,name) in unique_pairs:
+    name_to_id = defaultdict(lambda: set())
+    for (id, name) in unique_pairs:
         name_to_id[name].add(id)
 
-    for (k,v) in name_to_id.items():
+    for (k, v) in name_to_id.items():
         if len(v) > 4:
             print('name->ids ', k, v)
+
+
+def get_actors(casts: list[str]) -> Iterable[Actor]:
+    actors = []
+    for i, movie in enumerate(casts):
+        entries = get_cast_of_movie(i, movie)
+        actors.extend([(c.id, c.name) for c in entries])
+    actors = set(actors)
+    return actors
+
+
+def get_movies(filename: str) -> Iterable[Movie]:
+    df = pd.read_csv(filename)
+    df_sub = df.loc[:, ['id', 'title']]  # wycinek tabel
+    df_as_dict = df_sub.to_dict(orient='records')
+    movies = [Movie(movie_id=d['id'], title=d['title']) for d in df_as_dict]
+    return movies
+
+def get_casts():
+    df = pd.read_csv('data/tmdb_5000_credits.csv')
+    casts_ = list(df['cast'])  # list[str]
+    return casts_
 
 if __name__ == '__main__':
     df = pd.read_csv('data/tmdb_5000_credits.csv')
