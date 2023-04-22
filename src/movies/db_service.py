@@ -4,8 +4,7 @@ import asyncpg
 from dotenv import load_dotenv
 from os import getenv
 
-from hello_world.model import User
-from movies.model import Actor, Movie
+from movies.model import *
 
 load_dotenv()
 URL = getenv('DATABASE_URL')
@@ -78,14 +77,40 @@ class DbService:
 
         return Movie(**dict(row))
 
+    async def get_movieactor(self, movie_id: int, actor_id: int) -> MovieActor | None:
+        async with self.pool.acquire() as connection:
+            row = await connection.fetchrow('select * from movie_actors where movie_id=$1 and actor_id=$2',
+                                            movie_id, actor_id)
+        return MovieActor(**dict(row)) if row else None
+
+    async def upsert_movieactor(self, movie_actor: MovieActor) -> MovieActor:
+        ma = movie_actor
+        if await self.get_movieactor(ma.movie_id, ma.actor_id) is None:
+            # insert
+            async with self.pool.acquire() as connection:
+                row = await connection.fetchrow("insert into movie_actors(movie_id, actor_id, cast_id, "
+                                                "character, credit_id, gender, order_) VALUES "
+                                                "($1,$2,$3,$4,$5,$6,$7) returning *",
+                                                ma.movie_id, ma.actor_id, ma.cast_id, ma.character,
+                                                ma.credit_id, ma.gender, ma.order_)
+        else:
+            # update
+            async with self.pool.acquire() as connection:
+                row = await connection.fetchrow("""update movie_actors set cast_id=$3, character=$4, credit_id=$5,
+                        gender=$6, order_=$7 where movie_id=$1 and actor_id=$2 returning *""",
+                                                ma.movie_id, ma.actor_id, ma.cast_id, ma.character,
+                                                ma.credit_id, ma.gender, ma.order_
+                                                )
+
+        return MovieActor(**dict(row))
+
 
 async def main_():
     db = DbService()
     await db.initialize()
-    await db.upsert_movie(Movie(1, 'Karramba'))
-
-
-
+    await db.upsert_movieactor(
+        MovieActor(movie_id=25975, actor_id=155007, cast_id=7, character='Himself',
+                   credit_id='58ce0164c3a3685104015b28', gender=2, order_=7))
 
 
 if __name__ == '__main__':

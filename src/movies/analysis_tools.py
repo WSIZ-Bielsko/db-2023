@@ -4,19 +4,24 @@ from collections.abc import Iterable
 
 import pandas as pd
 
-from movies.model import CastEntry, Actor, Movie
+from movies.model import CastEntry, Actor, Movie, MovieActor
 
 
 # pd.options.display.max_rows = 10
 
 
-def get_cast_of_movie(index: int, cast_field: str) -> list[CastEntry]:
+def get_cast_of_movie(movie_id: int, cast_field: str) -> list[CastEntry]:
     dicts = json.loads(cast_field)
     entries = []
     for d in dicts:
-        entry = CastEntry(movie_id=index, **d)
+        entry = CastEntry(movie_id=movie_id, **d)
         entries.append(entry)
     return entries
+
+def to_movie_actor(cast_entry: CastEntry) -> MovieActor:
+    e = cast_entry
+    return MovieActor(movie_id=e.movie_id, actor_id=e.id, cast_id=e.cast_id, character=e.character,
+                      credit_id=e.credit_id, gender=e.gender, order_=e.order)
 
 
 def check_unique_cast_creditid(casts: list[str]):
@@ -63,6 +68,19 @@ def get_movies(filename: str) -> Iterable[Movie]:
     movies = [Movie(movie_id=d['id'], title=d['title']) for d in df_as_dict]
     return movies
 
+def get_movieactors(filename: str) -> list[MovieActor]:
+    df = pd.read_csv(filename)
+    df_sub = df.loc[:, ['movie_id', 'cast']]  # wycinek tabel
+    df_as_dict = df_sub.to_dict(orient='records')
+    res = []
+    for row in df_as_dict:
+        movie_id = row['movie_id']
+        cast_as_str = row['cast']
+        all_casts = get_cast_of_movie(movie_id, cast_as_str)
+        all_casts = [to_movie_actor(c) for c in all_casts]
+        res.extend(all_casts)
+    return res
+
 
 def find_duplicates(casts: list[str]):
     name_id_pairs = []
@@ -100,8 +118,12 @@ if __name__ == '__main__':
 
     # check_unique_cast_creditid(casts_)
     # check_assignment_actor_actorid(casts_)
-    find_duplicates(casts_)
+    # find_duplicates(casts_)
     # c = get_actors(casts_)
     # movies = get_movies('data/tmdb_5000_movies.csv')
+    movieactors = get_movieactors('data/tmdb_5000_credits.csv')
+    for m in movieactors:
+        print(m)
+    print(len(movieactors))
     # for c in movies:
     #     print(c)

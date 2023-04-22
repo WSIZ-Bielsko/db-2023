@@ -7,13 +7,23 @@ from dataclasses import dataclass
 @dataclass
 class CastEntry:
     movie_id: int  # dodane... rząd w csv-ie
+    id: int  # id of the actor
     cast_id: int
     character: str
     credit_id: str
     gender: int
-    id: int  # id of ... the actor?
     name: str
     order: int
+
+@dataclass
+class MovieActor:
+    movie_id: int  # dodane... rząd w csv-ie
+    actor_id: int  # id of the actor
+    cast_id: int
+    character: str
+    credit_id: str
+    gender: int
+    order_: int
 
 
 # {'credit_id': '573c8e2f9251413f5d000094', 'department': 'Crew', 'gender': 1,
