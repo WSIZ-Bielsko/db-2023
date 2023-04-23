@@ -4,7 +4,7 @@ from collections.abc import Iterable
 
 import pandas as pd
 
-from movies.model import CastEntry, Actor, Movie, MovieActor
+from src.movies.model import CastEntry, Actor, Movie, MovieActor
 
 
 # pd.options.display.max_rows = 10

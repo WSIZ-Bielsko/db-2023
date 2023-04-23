@@ -4,7 +4,7 @@ import asyncpg
 from dotenv import load_dotenv
 from os import getenv
 
-from movies.model import *
+from src.movies.model import *
 
 load_dotenv()
 URL = getenv('DATABASE_URL')

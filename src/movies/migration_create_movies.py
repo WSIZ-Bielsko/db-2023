@@ -1,8 +1,8 @@
 from asyncio import run, create_task, gather
 
-from movies.analysis_tools import get_casts, get_actors, get_movies
-from movies.db_service import DbService
-from movies.model import Actor
+from src.movies.analysis_tools import get_casts, get_actors, get_movies
+from src.movies.db_service import DbService
+from src.movies.model import Actor
 
 
 async def create_movies():
