@@ -39,7 +39,7 @@ CREATE TABLE movie_company(
 
 CREATE TABLE movie_cast(
     cast_id SERIAL PRIMARY KEY,
-    character TEXT NOT NULL UNIQUE,
+    character TEXT NOT NULL,
     movie_id INT REFERENCES movie(movie_id) ON DELETE CASCADE,
     crew_id INT REFERENCES crew(crew_id) ON DELETE CASCADE,
     credit_order INT
