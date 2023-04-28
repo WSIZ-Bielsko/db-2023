@@ -14,6 +14,16 @@ class CastEntry:
     name: str
     order: int
 
+@dataclass
+class MovieActor:
+    cast_id: int
+    movie_id: int
+    actor_id: int
+    credit_id: str
+    character: str
+    gender: int
+    position: int
+
 
 # {'credit_id': '573c8e2f9251413f5d000094', 'department': 'Crew', 'gender': 1, 'id': 1621932, 'job': 'Stunts', 'name': 'Min Windle'}
 
@@ -38,3 +48,15 @@ class Movie:
 class Actor:
     actor_id: int
     name: str
+
+
+# "[{""id"": 28, ""name"": ""Action""}, {""id"": 12, ""name"": ""Adventure""}, {""id"": 14, ""name"": ""Fantasy""}, {""id"": 878, ""name"": ""Science Fiction""}]"
+@dataclass
+class Genre:
+    genre_id: int
+    name: str
+
+@dataclass
+class MovieGenre:
+    movie_id: int
+    genre_id: int
