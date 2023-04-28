@@ -10,7 +10,7 @@ import json
 
 from db_class import DbService
 
-from model import Actor
+from model import Movie
 from src.movies.analysis_tools import *
 
 
@@ -18,14 +18,12 @@ async def main():
     db = DbService()
     await db.initialize()  # tu łączymy się z bazą danych
 
-    casts_ = get_casts()
-    actors = get_actors(casts_)
-    actors = [Actor(*a) for a in actors]
+    actors = get_movie_actors('data/tmdb_5000_credits.csv')
 
     print(f'all actors: {len(actors)}')
 
-    for i, a in enumerate(actors):
-        await db.upsert_actor(a)
+    for i, actor in enumerate(actors):
+        await db.upsert_movie_actor(actor)
         if i % 100 == 0:
             print(f'import in {i / len(actors) * 100:.1f}% done')
 
