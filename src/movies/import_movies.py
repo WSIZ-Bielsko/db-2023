@@ -1,42 +1,32 @@
-import os
-import pandas as pd
+from asyncio import run, sleep
+
+import asyncpg
 from dotenv import load_dotenv
-from pathlib import Path
-import psycopg2
-from psycopg2 import extras
+from os import getenv
 
-dotenv_path = Path('../.env')
-load_dotenv()
-conn = psycopg2.connect(
-    database=os.getenv("DATABASE"),
-    user="postgres",
-    password=os.getenv("PASSWORD"),
-    host=os.getenv("HOST"),
-    port=os.getenv("PORT"))
+import pandas as pd
 
-data = pd.read_csv("./data/tmdb_5000_movies.csv")
+import json
 
-# df = pd.DataFrame(data)
+from db_class import DbService
 
-df = data[['id','title']]
+from model import Movie
+from src.movies.analysis_tools import get_movies
 
-def row_to_tuple(row):
-    return (row['id'], row['title'])
 
-data = df.apply(row_to_tuple, axis=1).tolist()
+async def main():
+    db = DbService()
+    await db.initialize()  # tu łączymy się z bazą danych
+    movies = get_movies('data/tmdb_5000_movies.csv')
+    print(f'all movies: {len(movies)}')
 
-query = """
----sql
-    INSERT INTO s3878movie.movies (movie_id, title) VALUES %s
-"""
+    for i, movie in enumerate(movies):
+        await db.upsert_movie(movie)
+        if i % 100 == 0:
+            print(f'import in {i / len(movies) * 100:.1f}% done')
 
-extras.execute_values(
-    cur=conn.cursor(),
-    sql=query,
-    argslist=data,
-    template=None,
-    page_size=100
-)
+    await sleep(1)
 
-conn.commit()
-conn.close()
+
+if __name__ == '__main__':
+    run(main())

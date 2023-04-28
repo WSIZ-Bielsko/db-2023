@@ -18,16 +18,13 @@ async def main():
     db = DbService()
     await db.initialize()  # tu łączymy się z bazą danych
 
-    casts_ = get_casts()
-    actors = get_actors(casts_)
-    actors = [Actor(*a) for a in actors]
+    genres = get_genres()
+    print(len(genres))
 
-    print(f'all actors: {len(actors)}')
-
-    for i, a in enumerate(actors):
-        await db.upsert_actor(a)
+    for i, genre in enumerate(genres):
+        await db.upsert_genre(genre)
         if i % 100 == 0:
-            print(f'import in {i / len(actors) * 100:.1f}% done')
+            print(f'import in {i / len(genres) * 100:.1f}% done')
 
     await sleep(1)
 
