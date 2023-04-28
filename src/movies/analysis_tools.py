@@ -124,6 +124,26 @@ def get_actors(casts: list[str]) -> Iterable[Actor]:
     return actors
 
 
+def get_movie_actors(filename: str) -> Iterable[MovieActor]:
+    df = pd.read_csv(filename)
+    df_sub = df.loc[:, ['movie_id', 'cast']]  # wycinek tabel
+    df_as_dict = df_sub.to_dict(orient='records')
+
+    res = []
+    for row in df_as_dict:
+        movie_id = row['movie_id']
+        cast_as_str = row['cast']
+        all_casts = get_cast_of_movie(movie_id, cast_as_str)
+        all_casts = [to_movie_actor(c) for c in all_casts]
+        res.extend(all_casts)
+
+    return res
+
+def to_movie_actor(cast_entry: CastEntry) -> MovieActor:
+    c = cast_entry
+    return MovieActor(movie_id=c.movie_index, actor_id=c.id, cast_id=c.cast_id, credit_id=c.credit_id, character=c.character, gender=c.gender, position=c.order)
+
+
 def get_movies(filename: str) -> Iterable[Movie]:
     df = pd.read_csv(filename)
     df_sub = df.loc[:, ['id', 'title']]  # wycinek tabel
@@ -131,10 +151,37 @@ def get_movies(filename: str) -> Iterable[Movie]:
     movies = [Movie(movie_id=d['id'], title=d['title']) for d in df_as_dict]
     return movies
 
+
 def get_casts():
     df = pd.read_csv('data/tmdb_5000_credits.csv')
     casts_ = list(df['cast'])  # list[str]
     return casts_
+
+def get_genres():
+    df = pd.read_csv('data/tmdb_5000_movies.csv')
+    genres = list(df['genres'])  # list[str]
+    entries = []
+    for genre in genres:
+        dicts = json.loads(genre)
+        for d in dicts:
+            entry = Genre(genre_id=d['id'], name=d['name'])
+            if entry not in entries:
+                entries.append(entry)
+    return entries
+
+def get_movie_genres(filename):
+    df = pd.read_csv(filename)
+    df_sub = df.loc[:, ['id', 'genres']]  # wycinek tabel
+    df_as_dict = df_sub.to_dict(orient='records')
+    entries = []
+    for movie in df_as_dict:
+        genres = json.loads(movie.get('genres'))
+        for genre in genres:
+            entry = MovieGenre(movie_id=movie.get('id'), genre_id=genre['id'])
+            entries.append(entry)
+
+    return entries
+
 
 if __name__ == '__main__':
     df = pd.read_csv('data/tmdb_5000_credits.csv')
