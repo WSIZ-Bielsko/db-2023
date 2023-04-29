@@ -1,6 +1,6 @@
 """
 
-create table movei_pcountries
+create table movie_pcountries
 
 Revision ID: 03a94830a8ac
 Creation date: 2023-04-29 10:15:28.383063

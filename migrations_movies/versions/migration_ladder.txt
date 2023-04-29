@@ -1,0 +1,7 @@
+116c259c1a33	create table actors
+480c8a896701	create table movies
+aed1fafe8100	create table movie_actors
+2e4052030729	create table genres
+b355e311da60	create table movie_genres
+1dd498a89864	create table pcountries
+03a94830a8ac	create table movie_pcountries

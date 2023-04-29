@@ -1,16 +1,7 @@
-from asyncio import run, sleep
-
-import asyncpg
-from dotenv import load_dotenv
-from os import getenv
-
-import pandas as pd
-
-import json
+import asyncio
+from asyncio import run, sleep, create_task
 
 from db_class import DbService
-
-from model import Actor
 from src.movies.analysis_tools import *
 
 
@@ -20,12 +11,16 @@ async def main():
 
     genres = get_genres()
     print(len(genres))
+    tasks = []
 
     for i, genre in enumerate(genres):
-        await db.upsert_genre(genre)
+        tasks.append(create_task(db.upsert_genre(genre)))
         if i % 100 == 0:
             print(f'import in {i / len(genres) * 100:.1f}% done')
+            await asyncio.gather(*tasks)
+            tasks = []
 
+    await asyncio.gather(*tasks)
     await sleep(1)
 
 

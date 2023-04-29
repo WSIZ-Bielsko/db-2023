@@ -139,9 +139,11 @@ def get_movie_actors(filename: str) -> Iterable[MovieActor]:
 
     return res
 
+
 def to_movie_actor(cast_entry: CastEntry) -> MovieActor:
     c = cast_entry
-    return MovieActor(movie_id=c.movie_index, actor_id=c.id, cast_id=c.cast_id, credit_id=c.credit_id, character=c.character, gender=c.gender, position=c.order)
+    return MovieActor(movie_id=c.movie_index, actor_id=c.id, cast_id=c.cast_id, credit_id=c.credit_id,
+                      character=c.character, gender=c.gender, position=c.order)
 
 
 def get_movies(filename: str) -> Iterable[Movie]:
@@ -157,6 +159,7 @@ def get_casts():
     casts_ = list(df['cast'])  # list[str]
     return casts_
 
+
 def get_genres():
     df = pd.read_csv('data/tmdb_5000_movies.csv')
     genres = list(df['genres'])  # list[str]
@@ -169,18 +172,20 @@ def get_genres():
                 entries.append(entry)
     return entries
 
-def get_movie_genres(filename):
+
+def get_movie_genres(filename) -> set[MovieGenre]:
     df = pd.read_csv(filename)
     df_sub = df.loc[:, ['id', 'genres']]  # wycinek tabel
     df_as_dict = df_sub.to_dict(orient='records')
-    entries = []
+    entries = set()
     for movie in df_as_dict:
         genres = json.loads(movie.get('genres'))
         for genre in genres:
             entry = MovieGenre(movie_id=movie.get('id'), genre_id=genre['id'])
-            entries.append(entry)
+            entries.add(entry)
 
     return entries
+
 
 def get_pcountries():
     df = pd.read_csv('data/tmdb_5000_movies.csv')
@@ -194,14 +199,15 @@ def get_pcountries():
                 entries.append(entry)
     return entries
 
+
 def get_movie_pcountries(filename):
     df = pd.read_csv(filename)
     df_sub = df.loc[:, ['id', 'production_countries']]  # wycinek tabel
     df_as_dict = df_sub.to_dict(orient='records')
     entries = []
     for movie in df_as_dict:
-        pcountries  = json.loads(movie.get('production_countries'))
-        for pcountry in pcountries :
+        pcountries = json.loads(movie.get('production_countries'))
+        for pcountry in pcountries:
             entry = MoviePCountry(movie_id=movie.get('id'), iso_3166_1=pcountry['iso_3166_1'])
             entries.append(entry)
 

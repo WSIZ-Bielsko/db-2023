@@ -58,7 +58,7 @@ class Genre:
     name: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class MovieGenre:
     movie_id: int
     genre_id: int

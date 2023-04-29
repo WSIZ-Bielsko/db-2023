@@ -16,7 +16,7 @@ SCHEMA = getenv('SCHEMA')
 class DbService:
 
     async def initialize(self):
-        self.pool = await asyncpg.create_pool(URL, timeout=30, command_timeout=5,
+        self.pool = await asyncpg.create_pool(URL, timeout=30, command_timeout=5, min_size=15, max_size=20,
                                               server_settings={'search_path': SCHEMA})
 
         print('connected!')
