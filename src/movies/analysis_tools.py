@@ -187,7 +187,7 @@ def get_movie_genres(filename) -> set[MovieGenre]:
     return entries
 
 
-def get_pcountries():
+def get_pcountries() -> list[PCountry]:
     df = pd.read_csv('data/tmdb_5000_movies.csv')
     pcountries = list(df['production_countries'])  # list[str]
     entries = []
