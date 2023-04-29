@@ -14,6 +14,7 @@ class CastEntry:
     name: str
     order: int
 
+
 @dataclass
 class MovieActor:
     cast_id: int
@@ -56,7 +57,19 @@ class Genre:
     genre_id: int
     name: str
 
+
 @dataclass
 class MovieGenre:
     movie_id: int
     genre_id: int
+
+
+@dataclass
+class PCountry:
+    iso_3166_1: str
+    name: str
+
+@dataclass
+class MoviePCountry:
+    movie_id: int
+    iso_3166_1: str
