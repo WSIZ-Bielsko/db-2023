@@ -175,3 +175,63 @@ class DbService:
                                                 movie_id, genre_id)
 
         return MovieGenre(**dict(row))
+
+    async def get_pcountry(self, iso: str):
+        async with self.pool.acquire() as connection:
+            row = await connection.fetchrow('SELECT * FROM pcountries WHERE iso_3166_1=$1', iso)
+        return PCountry(**dict(row)) if row else None
+
+
+    async def get_pcountries(self, offset=0, limit=500) -> list[PCountry]:
+        async with self.pool.acquire() as connection:
+            rows = await connection.fetch('SELECT * FROM pcountries ORDER BY name OFFSET $1 LIMIT $2', offset, limit)
+        return [PCountry(**dict(r)) for r in rows]
+
+
+    async def upsert_pcountry(self, pcountry: PCountry) -> PCountry:
+        if pcountry.iso_3166_1 is None:
+            raise ValueError("PCountry must have iso_3166_1 value.")
+
+        async with self.pool.acquire() as connection:
+            if pcountry.name is None:
+                row = await connection.fetchrow(
+                    "insert into pcountries(iso_3166_1) VALUES ($1) returning *",
+                    pcountry.iso_3166_1,
+                )
+            else:
+                row = await connection.fetchrow(
+                    "insert into pcountries(iso_3166_1, name) VALUES ($1, $2) "
+                    "on conflict (iso_3166_1) do update set name = $2 returning *",
+                    pcountry.iso_3166_1,
+                    pcountry.name,
+                )
+
+        return PCountry(**dict(row))
+
+    async def get_movie_pcountry(self, movie_id: int, iso_3166_1: str):
+        async with self.pool.acquire() as connection:
+            row = await connection.fetchrow('select * from movie_pcountries where movie_id=$1 and iso_3166_1=$2', movie_id, iso_3166_1)
+        return MoviePCountry(**dict(row)) if row else None
+
+    async def get_movie_pcountries(self, offset=0, limit=500) -> list[MoviePCountry]:
+        async with self.pool.acquire() as connection:
+            rows = await connection.fetch('select * from movie_pcountries order by movie_id, iso_3166_1 offset $1 limit $2', offset, limit)
+        return [MoviePCountry(**dict(r)) for r in rows]
+
+    async def upsert_movie_pcountry(self, movie_pcountry: MoviePCountry) -> MoviePCountry:
+        movie_id = movie_pcountry.movie_id
+        iso_3166_1 = movie_pcountry.iso_3166_1
+        if await self.get_movie_pcountry(movie_id, iso_3166_1) is None:
+            # insert
+            async with self.pool.acquire() as connection:
+                row = await connection.fetchrow("insert into movie_pcountries(movie_id, iso_3166_1) VALUES ($1,$2) returning *",
+                                                movie_id, iso_3166_1)
+        else:
+            # update
+            async with self.pool.acquire() as connection:
+                row = await connection.fetchrow("""update movie_pcountries set movie_id=$1 where iso_3166_1=$2 returning *""",
+                                                movie_id, iso_3166_1)
+
+        return MoviePCountry(**dict(row))
+
+

@@ -182,12 +182,38 @@ def get_movie_genres(filename):
 
     return entries
 
+def get_pcountries():
+    df = pd.read_csv('data/tmdb_5000_movies.csv')
+    pcountries = list(df['production_countries'])  # list[str]
+    entries = []
+    for pcountry in pcountries:
+        dicts = json.loads(pcountry)
+        for d in dicts:
+            entry = PCountry(iso_3166_1=d['iso_3166_1'], name=d['name'])
+            if entry not in entries:
+                entries.append(entry)
+    return entries
+
+def get_movie_pcountries(filename):
+    df = pd.read_csv(filename)
+    df_sub = df.loc[:, ['id', 'production_countries']]  # wycinek tabel
+    df_as_dict = df_sub.to_dict(orient='records')
+    entries = []
+    for movie in df_as_dict:
+        pcountries  = json.loads(movie.get('production_countries'))
+        for pcountry in pcountries :
+            entry = MoviePCountry(movie_id=movie.get('id'), iso_3166_1=pcountry['iso_3166_1'])
+            entries.append(entry)
+
+    return entries
+
 
 if __name__ == '__main__':
-    df = pd.read_csv('data/tmdb_5000_credits.csv')
+    # df = pd.read_csv('data/tmdb_5000_credits.csv')
     # casts_ = list(df['cast'])  # list[str]
-    crews_ = list(df['crew'])  # list[str]
+    # crews_ = list(df['crew'])  # list[str]
     # check_unique_cast_creditid(casts_)
-    check_unique_crew_creditid(crews_)
+    # check_unique_crew_creditid(crews_)
     # check_assignment_actor_actorid(casts_)
-    find_duplicates_crew(crews_)
+    # find_duplicates_crew(crews_)
+    print(len(get_movie_pcountries('data/tmdb_5000_movies.csv')))
