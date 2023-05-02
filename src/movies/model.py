@@ -73,3 +73,30 @@ class PCountry:
 class MoviePCountry:
     movie_id: int
     iso_3166_1: str
+
+@dataclass(frozen=True)
+class Crew:
+    crew_id: int  # unique
+    gender: int
+    name: str
+
+
+@dataclass
+class MovieCrew:
+    movie_id: int
+    crew_id: int
+    gender: int
+    name: str
+    credit_id: str  # id of ... the person?
+    job: str
+    department: str
+
+@dataclass
+class EntryOfCrew:
+    movie_id: int
+    id: int
+    credit_id: str
+    department: str
+    gender: int
+    job: str
+    name: str

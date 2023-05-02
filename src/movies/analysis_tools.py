@@ -213,6 +213,44 @@ def get_movie_pcountries(filename):
 
     return entries
 
+def get_crew():
+    df = pd.read_csv('data/tmdb_5000_credits.csv')
+    crews = list(df['crew']) # DELETE HEAD BEFORE IMPORT!!!!
+    enter_data = set()
+    for i in crews:
+        dictionaries = json.loads(i)
+        for j in dictionaries:
+            data = Crew(crew_id=j['id'], gender=j['gender'], name=j['name'])
+            if data not in enter_data:
+                enter_data.add(data)
+    return enter_data
+
+
+def get_moviecrew() -> list[MovieCrew]:
+    df = pd.read_csv('data/tmdb_5000_credits.csv')
+    df_sub = df.loc[:, ['movie_id', 'crew']]  # wycinek tabel
+    df_as_dict = df_sub.to_dict(orient='records')
+    res = []
+    for row in df_as_dict:
+        movie_id = row['movie_id']
+        crew_as_str = row['crew']
+        all_crews = get_crew_movie(movie_id, crew_as_str)
+        all_crews = [to_movie_crew(c) for c in all_crews]
+        res.extend(all_crews)
+    return res
+
+def get_crew_movie(movie_id: int, crew_field: str) -> list[EntryOfCrew]:
+    dicts = json.loads(crew_field)
+    entries = []
+    for d in dicts:
+        entry = EntryOfCrew(movie_id=movie_id, **d)
+        entries.append(entry)
+    return entries
+
+def to_movie_crew(crew_entry: EntryOfCrew) -> MovieCrew:
+    e = crew_entry
+    return MovieCrew(movie_id=e.movie_id, crew_id=e.id, credit_id=e.credit_id,
+                     department=e.department, job=e.job, gender=e.gender, name=e.name)
 
 if __name__ == '__main__':
     # df = pd.read_csv('data/tmdb_5000_credits.csv')
