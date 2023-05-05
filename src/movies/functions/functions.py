@@ -133,6 +133,53 @@ def get_movie_genres(filename):
     return entries
 
 
+# Countries
+def get_countries(filename: str) -> list[Country]:
+    df = pd.read_csv(filename)
+    prod_count = list(df['production_countries'])
+    entries = []
+    for count in prod_count:
+        dicts = json.loads(count)
+        for d in dicts:
+            entry = Country(country_id=d['iso_3166_1'], name=d['name'])
+            if entry not in entries:
+                entries.append(entry)
+
+    return entries
+
+
+def get_countries_of_movie(index: int, country_field: str):
+    dicts = json.loads(country_field)
+    countries = []
+    for d in dicts:
+        d['country_id'] = d['iso_3166_1']
+        del d['iso_3166_1']
+        country = CountryEntry(index, **d)
+        countries.append(country)
+
+    return countries
+
+
+def get_movie_country(filename: str):
+    df = pd.read_csv(filename)
+    subframe = df.loc[:, ['id', 'production_countries']]
+    subframe_as_dict = subframe.to_dict(orient='records')
+    result = []
+    for row in subframe_as_dict:
+        movie_id = row['id']
+        countries = row['production_countries']
+        all_countries = get_countries_of_movie(movie_id, countries)
+        movie_country = [to_moviecountry(mc) for mc in all_countries]
+        result.extend(movie_country)
+
+    return result
+
+
+def to_moviecountry(country_entry: CountryEntry) -> MovieCountry:
+    ce = country_entry
+    return MovieCountry(movie_id=ce.movie_index, country_id=ce.country_id)
+
+
 if __name__ == '__main__':
     cdf = pd.read_csv('./datas/tmdb_5000_credits.csv')
     casts_ = list(cdf['cast'])

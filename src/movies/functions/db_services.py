@@ -224,6 +224,57 @@ class DbService:
 
         return MovieGenre(**dict(row))
 
+    # Countries
+    async def get_country(self, country_id: str) -> Country | None:
+        async with self.pool.acquire() as connection:
+            row = await connection.fetchrow('select * from countries where country_id=$1',
+                                            country_id)
+
+            return Country(**(row)) if row else None
+
+    async def get_countries(self, offset=0, limit=100) -> list[Country]:
+        async with self.pool.acquire() as connection:
+            rows = await connection.fetch('select * from countries '
+                                          'order by country_id offset $1 limit $2',
+                                          offset, limit)
+
+        return [Country(**dict(row)) for row in rows]
+
+    async def upsert_country(self, country: Country) -> Country:
+        c = country
+        if await self.get_country(c.country_id) is None:
+            # insert
+            async with self.pool.acquire() as connection:
+                row = await connection.fetchrow('insert into countries(country_id, name) values ($1, $2)'
+                                                'returning *', c.country_id, c.name)
+        else:
+            async with self.pool.acquire() as connection:
+                row = await connection.fetchrow('update countries set name=$2 where country_id=$1 returning *',
+                                                c.country_id, c.name)
+        return Country(**dict(row))
+
+    # Movie Countries
+    async def get_movie_country(self, movie_id: int) -> MovieCountry:
+        async with self.pool.acquire() as connection:
+            row = await connection.fetchrow('select * from movie_countries where movie_id=$1',
+                                            movie_id)
+
+        return MovieCountry(**dict(row)) if row else None
+
+    async def upsert_movie_country(self, movie_country: MovieCountry) -> MovieCountry:
+        mc = movie_country
+        if await self.get_movie_country(mc.movie_id) is None:
+            # insert
+            async with self.pool.acquire() as connection:
+                row = await connection.fetchrow('insert into movie_countries(movie_id, country_id) values ($1, $2)'
+                                                'returning *', mc.movie_id, mc.country_id)
+        else:
+            async with self.pool.acquire() as connection:
+                row = await connection.fetchrow('update movie_countries set country_id=$2 where movie_id=$1 '
+                                                'returning *', mc.movie_id, mc.country_id)
+
+        return MovieCountry(**dict(row))
+
 
 async def main_():
     db = DbService()
