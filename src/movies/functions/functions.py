@@ -3,8 +3,6 @@ from collections.abc import Iterable
 import pandas as pd
 from model import *
 
-pd.options.display.max_rows = 10
-
 
 # Actors
 def get_cast():
@@ -48,12 +46,12 @@ def get_crew_of_movie(index: int, crew_field: str) -> list[CrewEntry]:
 
 
 def get_crew_persons(crews: list) -> Iterable[CrewPerson]:
-    people = []
+    persons = []
     for c, movie in enumerate(crews):
         entries = get_crew_of_movie(c, movie)
-        people.extend([(e.id, e.name) for e in entries])
-    people = set(people)
-    return people
+        persons.extend([(e.id, e.name) for e in entries])
+    persons = set(persons)
+    return persons
 
 
 def to_movie_crew(crew_entry: CrewEntry) -> MovieCrew:
@@ -105,6 +103,34 @@ def get_movie_crew(filename: str) -> Iterable[MovieCrew]:
         result.extend(all_crew)
 
     return result
+
+
+# Genres
+def get_genres(filename):
+    df = pd.read_csv(filename)
+    genres = list(df['genres'])
+    entries = []
+    for genre in genres:
+        dicts = json.loads(genre)
+        for d in dicts:
+            entry = Genre(genre_id=d['id'], name=d['name'])
+            if entry not in entries:
+                entries.append(entry)
+    return entries
+
+
+def get_movie_genres(filename):
+    df = pd.read_csv(filename)
+    df_sub = df.loc[:, ['id', 'genres']]
+    df_as_dict = df_sub.to_dict(orient='records')
+    entries = []
+    for movie in df_as_dict:
+        genres = json.loads(movie.get('genres'))
+        for genre in genres:
+            entry = MovieGenre(movie_id=movie.get('id'), genre_id=genre['id'])
+            entries.append(entry)
+
+    return entries
 
 
 if __name__ == '__main__':
