@@ -111,6 +111,7 @@ async def main_():
     await db.upsert_movieactor(
         MovieActor(movie_id=25975, actor_id=155007, cast_id=7, character='Himself',
                    credit_id='58ce0164c3a3685104015b28', gender=2, order_=7))
+    
 
 
 if __name__ == '__main__':
