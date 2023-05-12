@@ -73,3 +73,14 @@ class PCountry:
 class MoviePCountry:
     movie_id: int
     iso_3166_1: str
+
+@dataclass
+class crew:
+    crew_id: int
+    name: str
+
+@dataclass
+class MoviePCountry:
+    credit_id: text
+    crew_id: int
+    movie_id: int
