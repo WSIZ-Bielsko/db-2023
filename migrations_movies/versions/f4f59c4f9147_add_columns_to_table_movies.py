@@ -20,7 +20,7 @@ def upgrade() -> None:
     alter table s9999movies.movies
     add budget bigint default 0,
     add popularity float default 0,
-    add release_date date default '1000-01-01',
+    add release_date date default '0001-01-01',
     add revenue bigint default 0;
     """)
 
