@@ -148,9 +148,17 @@ def to_movie_actor(cast_entry: CastEntry) -> MovieActor:
 
 def get_movies(filename: str) -> Iterable[Movie]:
     df = pd.read_csv(filename)
-    df_sub = df.loc[:, ['id', 'title']]  # wycinek tabel
+    df_sub = df.loc[:, ['id', 'title', 'budget', 'popularity', 'release_date', 'revenue']]  # wycinek tabel
     df_as_dict = df_sub.to_dict(orient='records')
-    movies = [Movie(movie_id=d['id'], title=d['title']) for d in df_as_dict]
+    movies = []
+    for d in df_as_dict:
+        date = d['release_date']
+        try:
+            release_date = datetime.strptime(str(date), '%Y-%m-%d').date()
+        except:
+            print(date)
+
+        movies.append(Movie(movie_id=d['id'], title=d['title'], budget = d['budget'], popularity = d['popularity'], release_date=release_date, revenue = d['revenue']/1000))
     return movies
 
 
