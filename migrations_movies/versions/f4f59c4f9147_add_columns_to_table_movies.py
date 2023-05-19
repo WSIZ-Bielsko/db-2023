@@ -17,7 +17,7 @@ depends_on = None
 
 def upgrade() -> None:
     op.execute("""
-    alter table s9999movies.movies
+    alter table movies
     add budget bigint default 0,
     add popularity float default 0,
     add release_date date default '0001-01-01',
@@ -27,7 +27,7 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.execute("""
-    alter table s9999movies.movies
+    alter table movies
     drop column budget,
     drop column popularity,
     drop column release_date,
