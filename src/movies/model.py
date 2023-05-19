@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-
+from datetime import datetime, date
 
 # {'cast_id': 102, 'character': 'Ambient Room Tech / Troupe', 'credit_id': '52fe48019251416c750acb6f', 'gender': 1, 'id': 42286, 'name': 'Julene Renee', 'order': 82}
 
@@ -43,7 +43,10 @@ class CrewEntry:
 class Movie:
     movie_id: int
     title: str
-
+    budget: int
+    popularity: float
+    release_date: date
+    revenue: int
 
 @dataclass
 class Actor:
