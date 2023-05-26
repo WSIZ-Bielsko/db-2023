@@ -1,26 +1,14 @@
 from asyncio import run, sleep
 
-import asyncpg
-from dotenv import load_dotenv
-from os import getenv
-
-import pandas as pd
-
-import json
-
-from db_class import DbService
-
-from model import Actor
-from src.movies.analysis_tools import *
+from db_service import DbService
+from src.movies.import_tools import *
 
 
 async def main():
     db = DbService()
-    await db.initialize()  # tu łączymy się z bazą danych
+    await db.initialize()
 
-    casts_ = get_casts()
-    actors = get_actors(casts_)
-    actors = [Actor(*a) for a in actors]
+    actors = get_actors(filename='data/tmdb_5000_credits.csv')
 
     print(f'all actors: {len(actors)}')
 

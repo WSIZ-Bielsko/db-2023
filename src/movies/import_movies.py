@@ -1,32 +1,23 @@
-from asyncio import run, sleep
+from asyncio import run, create_task, gather, sleep
 
-import asyncpg
-from dotenv import load_dotenv
-from os import getenv
-
-import pandas as pd
-
-import json
-
-from db_class import DbService
-
-from model import Movie
-from src.movies.analysis_tools import get_movies
+from src.movies.db_service import DbService
+from src.movies.import_tools import get_movies
 
 
-async def main():
+async def import_movies():
     db = DbService()
-    await db.initialize()  # tu łączymy się z bazą danych
-    movies = get_movies('data/tmdb_5000_movies.csv')
-    print(f'all movies: {len(movies)}')
+    await db.initialize()
 
-    for i, movie in enumerate(movies):
-        await db.upsert_movie(movie)
+    movies = get_movies('data/tmdb_5000_movies.csv')
+    tasks = []
+    for i, m in enumerate(movies):
+        tasks.append(create_task(db.upsert_movie(m)))
         if i % 100 == 0:
             print(f'import in {i / len(movies) * 100:.1f}% done')
-
+        await gather(*tasks)
+    print('all done')
     await sleep(1)
 
 
 if __name__ == '__main__':
-    run(main())
+    run(import_movies())

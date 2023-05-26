@@ -7,20 +7,22 @@ from src.movies.import_tools import *
 
 async def main():
     db = DbService()
-    await db.initialize()  # tu łączymy się z bazą danych
+    await db.initialize()
 
-    genres = get_genres(filename='data/tmdb_5000_movies.csv')
-    print('all genres: ', len(genres))
+    crew = get_crews(filename='data/tmdb_5000_credits.csv')
+
+    print(f'all crews: {len(crew)}')
     tasks = []
 
-    for i, genre in enumerate(genres):
-        tasks.append(create_task(db.upsert_genre(genre)))
+    for i, c in enumerate(crew):
+        tasks.append(create_task(db.upsert_crew(c)))
         if i % 100 == 0:
-            print(f'import in {i / len(genres) * 100:.1f}% done')
             await asyncio.gather(*tasks)
             tasks = []
+            print(f'import in {i / len(crew) * 100:.1f}% done')
 
     await asyncio.gather(*tasks)
+
     await sleep(1)
 
 

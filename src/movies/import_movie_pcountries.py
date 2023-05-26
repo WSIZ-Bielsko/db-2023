@@ -1,8 +1,8 @@
 import asyncio
 from asyncio import run, sleep
 
-from db_class import DbService
-from src.movies.analysis_tools import *
+from db_service import DbService
+from src.movies.import_tools import *
 
 
 async def main():
@@ -22,9 +22,9 @@ async def main():
             tasks = []
     await asyncio.gather(*tasks)
 
-
     await sleep(1)
     print('all done')
+
 
 if __name__ == '__main__':
     run(main())

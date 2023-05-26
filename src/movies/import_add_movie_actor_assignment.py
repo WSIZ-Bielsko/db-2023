@@ -1,6 +1,6 @@
 from asyncio import run, create_task, gather
 
-from src.movies.analysis_tools import get_casts, get_actors, get_movies
+from src.movies.import_tools import *
 from src.movies.db_service import DbService
 from src.movies.model import Actor
 
@@ -9,13 +9,13 @@ async def create_movies():
     db = DbService()
     await db.initialize()
 
-    movies = get_movies('data/tmdb_5000_movies.csv')
-    print(f'all movies: {len(movies)}')
+    mactors = get_movieactors('./data/tmdb_5000_credits.csv')
+    print(f'all movieactors: {len(mactors)}')
     tasks = []
-    for i, m in enumerate(movies):
-        tasks.append(create_task(db.upsert_movie(m)))
+    for i, m in enumerate(mactors):
+        tasks.append(create_task(db.upsert_movieactor(m)))
         if i % 100 == 0:
-            print(f'import in {i / len(movies) * 100:.1f}% done')
+            print(f'import in {i / len(mactors) * 100:.1f}% done')
     await gather(*tasks)
     print('all done')
 
