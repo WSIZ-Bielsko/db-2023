@@ -23,7 +23,6 @@ async def fix_file_object(file: File) -> File:
     pattern = '%Y-%m-%dT%H:%M:%S'
     new_file.modified = datetime.strptime(file.modified, pattern)
     new_file.accessed = datetime.strptime(file.accessed, pattern)
-    if new_file.extension == '': new_file.extension = None
     return new_file
 
 

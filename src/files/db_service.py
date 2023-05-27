@@ -33,8 +33,7 @@ class DbService:
                 extension, type, mode, parent_path, full_path) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
                 returning *""", file.name, file.bytes, file.depth, file.accessed, file.modified, file.basename,
                 file.extension, file.type, file.mode, file.parent_path, file.full_path)
-                await connection.fetchrow("""alter sequence files_file_id_seq start with (select max(file_id) from files)
-                minvalue (select max(file_id) from files);""")
+                await connection.fetchrow("select setval('files_file_id_seq', (select max(file_id) from files))")
         elif await self.get_file(file.file_id) is None:
             # insert
             async with self.pool.acquire() as connection:
@@ -42,8 +41,7 @@ class DbService:
                 basename, extension, type, mode, parent_path, full_path) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
                 $10, $11, $12) returning *""", file.file_id, file.name, file.bytes, file.depth, file.accessed,
                 file.modified, file.basename, file.extension, file.type, file.mode, file.parent_path, file.full_path)
-                await connection.fetchrow("""alter sequence files_file_id_seq start with (select max(file_id) from files)
-                minvalue (select max(file_id) from files)""")
+                await connection.fetchrow("select setval('files_file_id_seq', (select max(file_id) from files))")
         else:
             # update
             async with self.pool.acquire() as connection:
