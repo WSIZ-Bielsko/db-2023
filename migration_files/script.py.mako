@@ -1,12 +1,12 @@
-"""${message}
+"""
+
+${message}
 
 Revision ID: ${up_revision}
-Revises: ${down_revision | comma,n}
-Create Date: ${create_date}
+Creation date: ${create_date}
 
 """
-from alembic import op
-import sqlalchemy as sa
+from alembic import op, context
 ${imports if imports else ""}
 
 # revision identifiers, used by Alembic.
@@ -17,8 +17,18 @@ depends_on = ${repr(depends_on)}
 
 
 def upgrade() -> None:
-    ${upgrades if upgrades else "pass"}
+    ${upgrades if upgrades else ""}
+
+    if "seed" in context.get_x_argument(as_dictionary=True):
+        seed()
 
 
 def downgrade() -> None:
     ${downgrades if downgrades else "pass"}
+
+
+def seed() -> None:
+    seeds = []
+
+    for seed in seeds:
+        pass

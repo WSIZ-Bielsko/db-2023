@@ -1,9 +1,10 @@
+import os
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
+from dotenv import load_dotenv
+from loguru import logger
+from sqlalchemy import engine_from_config, pool
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -24,6 +25,15 @@ target_metadata = None
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+
+load_dotenv()
+url = os.getenv("DATABASE_URL", None)
+if url:
+    config.set_main_option("sqlalchemy.url", url)
+else:
+    logger.error("DATABASE_URL is not specified.")
+    logger.info("Try creating environmental variable or use .env.example.")
+    exit(1)
 
 
 def run_migrations_offline() -> None:
@@ -47,6 +57,8 @@ def run_migrations_offline() -> None:
     )
 
     with context.begin_transaction():
+        logger.info('running offline migration')
+        context.execute(f'set search_path to {os.getenv("SCHEMA")}')
         context.run_migrations()
 
 
@@ -58,19 +70,21 @@ def run_migrations_online() -> None:
 
     """
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        config.get_section(config.config_ini_section),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
-
+        context.configure(connection=connection, target_metadata=target_metadata)
+        logger.info('running online migration')
+        context.execute(f'set search_path to {os.getenv("SCHEMA")}')
         with context.begin_transaction():
             context.run_migrations()
 
+
+if "seed" in context.get_x_argument(as_dictionary=True):
+    print("Seeding enabled...")
 
 if context.is_offline_mode():
     run_migrations_offline()

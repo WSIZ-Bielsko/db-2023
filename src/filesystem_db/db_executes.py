@@ -6,7 +6,7 @@ import aiosqlite    # pip install aiosqlite
 async def doit():
     async with aiosqlite.connect('data/database.sqlite') as db:
         db.row_factory = aiosqlite.Row
-        async with db.execute('SELECT * FROM files') as cursor:
+        async with db.execute('SELECT * FROM files limit 10') as cursor:
             async for row in cursor:
                 fileid = row['fileid']
                 name = row['name']
