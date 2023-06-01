@@ -10,7 +10,7 @@ from db_service import *
 async def doit():
     async with aiosqlite.connect('data/database.sqlite') as db:
         db.row_factory = aiosqlite.Row
-        async with db.execute('SELECT * FROM files') as cursor:
+        async with db.execute('SELECT * FROM files limit 10') as cursor:
             list_of_data = []
             async for row in cursor:
                 file_id = row['fileid']
