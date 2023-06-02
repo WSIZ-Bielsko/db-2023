@@ -14,7 +14,10 @@ async def import_movies():
         tasks.append(create_task(db.upsert_movie(m)))
         if i % 100 == 0:
             print(f'import in {i / len(movies) * 100:.1f}% done')
-        await gather(*tasks)
+            await gather(*tasks)
+            tasks = []
+
+    await gather(*tasks)
     print('all done')
     await sleep(1)
 
