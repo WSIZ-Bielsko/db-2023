@@ -62,19 +62,21 @@ class DbService:
         if movie.movie_id is None:
             # insert
             async with self.pool.acquire() as connection:
-                row = await connection.fetchrow("insert into movies(title) VALUES ($1) returning *",
-                                                movie.title)
+                row = await connection.fetchrow("insert into movies(title,budget,popularity,release_date,revenue)"
+                                                "VALUES ($1,$2,$3,$4,$5) returning *", movie.title, movie.budget,
+                                                movie.popularity, movie.release_date, movie.revenue)
         elif await self.get_movie(movie.movie_id) is None:
             # insert
             async with self.pool.acquire() as connection:
-                row = await connection.fetchrow("insert into movies(movie_id,title) VALUES ($1,$2) returning *",
-                                                movie.movie_id, movie.title)
+                row = await connection.fetchrow("insert into movies(movie_id,title,budget,popularity,release_date,revenue)"
+                                                "VALUES ($1,$2,$3,$4,$5,$6) returning *", movie.movie_id, movie.title,
+                                                movie.budget, movie.popularity, movie.release_date, movie.revenue)
         else:
             # update
             async with self.pool.acquire() as connection:
-                row = await connection.fetchrow("""update movies set title=$2 where movie_id=$1 returning *""",
-                                                movie.movie_id, movie.title)
-
+                row = await connection.fetchrow("""update movies set title=$2, budget=$3, popularity=$4, release_date=$5,
+                                                revenue=$6 where movie_id=$1 returning *""", movie.movie_id, movie.title,
+                                                movie.budget, movie.popularity, movie.release_date, movie.revenue)
         return Movie(**dict(row))
 
     async def get_movieactor(self, movie_id: int, actor_id: int) -> MovieActor | None:
@@ -108,9 +110,8 @@ class DbService:
 async def main_():
     db = DbService()
     await db.initialize()
-    await db.upsert_movieactor(
-        MovieActor(movie_id=25975, actor_id=155007, cast_id=7, character='Himself',
-                   credit_id='58ce0164c3a3685104015b28', gender=2, order_=7))
+    await db.upsert_movie(Movie(movie_id=447028, title='Animals', budget=299792458, popularity=314.159265,
+                                release_date=date(2023, 5, 13), revenue=271828183))
 
 
 if __name__ == '__main__':

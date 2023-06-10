@@ -1,3 +1,4 @@
+import datetime
 from asyncio import run, sleep
 
 import asyncpg
@@ -21,6 +22,7 @@ async def main():
     print(f'all movies: {len(movies)}')
 
     for i, movie in enumerate(movies):
+        movie.release_date = datetime.date.min if isinstance(movie.release_date, float) else datetime.date.fromisoformat(movie.release_date)
         await db.upsert_movie(movie)
         if i % 100 == 0:
             print(f'import in {i / len(movies) * 100:.1f}% done')
