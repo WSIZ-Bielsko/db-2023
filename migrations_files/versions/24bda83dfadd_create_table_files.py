@@ -24,11 +24,11 @@ def upgrade() -> None:
         modified TIMESTAMP NOT NULL,
         basename TEXT NOT NULL,
         extension TEXT NOT NULL,
-        type TEXT NOT NULL CHECK(type = 'd' OR type = 'f'),
+        type TEXT NOT NULL CHECK(type in ('d', 'f')),
         mode TEXT NOT NULL CHECK(mode ~ '^[d-]([r-][w-][x-]){3}$'),
-        parent_path TEXT NOT NULL,
+        parent_path TEXT NOT NULL REFERENCES files(full_path),
         full_path TEXT NOT NULL UNIQUE CHECK(full_path LIKE parent_path || name || '%')
-    )""")
+    );""")
 
 
 def downgrade() -> None:
