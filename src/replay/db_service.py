@@ -74,6 +74,7 @@ async def main_():
     videos = await db.get_videos()
     print(videos)
     await db.set_like(video_id, alice_id, True)
+    await db.set_like(video_id, alice_id, False)
     await db.remove_like(video_id, alice_id)
     alice_comment_id = await db.post_comment(alice_id, 'nice video', video_id, None)
     bob_reply_id = await db.post_comment(bob_id, 'thanks', video_id, alice_comment_id)
