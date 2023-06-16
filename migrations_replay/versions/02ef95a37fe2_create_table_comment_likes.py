@@ -19,8 +19,8 @@ depends_on = None
 def upgrade() -> None:
     op.execute("""
     CREATE TABLE comment_likes(
-    comment_id UUID NOT NULL REFERENCES comment(comment_id),
-    channel_id UUID NOT NULL REFERENCES channel(channel_id),
+    comment_id UUID NOT NULL UNIQUE REFERENCES comment(comment_id),
+    channel_id UUID NOT NULL UNIQUE REFERENCES channel(channel_id),
     is_like BOOLEAN NOT NULL
     );""")
 

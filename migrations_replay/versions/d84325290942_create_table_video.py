@@ -21,7 +21,7 @@ def upgrade() -> None:
     CREATE TABLE video(
     video_id UUID DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
     title TEXT NOT NULL CHECK(title ~ '^[ -~]{1,50}$'),
-    owner UUID NOT NULL REFERENCES channel(channel_id),
+    owner_id UUID NOT NULL REFERENCES channel(channel_id),
     filename TEXT NOT NULL CHECK(filename ~ '^[ -~]{1,255}$'),
     description TEXT NOT NULL CHECK(title ~ '^[ -~]{1,100}$'),
     created TIMESTAMP DEFAULT NOW() NOT NULL CHECK(created <= edited),

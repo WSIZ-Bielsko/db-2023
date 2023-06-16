@@ -19,8 +19,8 @@ depends_on = None
 def upgrade() -> None:
     op.execute("""
     CREATE TABLE video_views(
-    video_id UUID NOT NULL REFERENCES video(video_id),
-    channel_id UUID NOT NULL REFERENCES channel(channel_id)
+    video_id UUID NOT NULL UNIQUE REFERENCES video(video_id),
+    channel_id UUID NOT NULL UNIQUE REFERENCES channel(channel_id)
     );""")
 
 

@@ -19,8 +19,8 @@ depends_on = None
 def upgrade() -> None:
     op.execute("""
     CREATE TABLE playlist_views(
-    playlist_id UUID NOT NULL REFERENCES playlist(playlist_id),
-    channel_id UUID NOT NULL REFERENCES channel(channel_id)
+    playlist_id UUID NOT NULL UNIQUE REFERENCES playlist(playlist_id),
+    channel_id UUID NOT NULL UNIQUE REFERENCES channel(channel_id)
     );""")
 
 

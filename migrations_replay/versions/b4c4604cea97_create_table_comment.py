@@ -20,7 +20,7 @@ def upgrade() -> None:
     op.execute("""
     CREATE TABLE comment(
     comment_id UUID DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
-    author UUID NOT NULL REFERENCES channel(channel_id),
+    author_id UUID NOT NULL REFERENCES channel(channel_id),
     content TEXT NOT NULL CHECK(content ~ '^[ -~]{1,}$' and length(content) < 500),
     video_id UUID NOT NULL REFERENCES video(video_id),
     parent_comment UUID REFERENCES comment(comment_id) CHECK(parent_comment != comment_id),

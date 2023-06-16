@@ -21,7 +21,7 @@ def upgrade() -> None:
     CREATE TABLE playlist(
     playlist_id UUID DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
     playlist_name TEXT NOT NULL CHECK(playlist_name ~ '^[ -~]{1,50}$'),
-    playlist_owner UUID NOT NULL REFERENCES channel(channel_id),
+    playlist_owner_id UUID NOT NULL REFERENCES channel(channel_id),
     created TIMESTAMP DEFAULT NOW() NOT NULL CHECK(created <= edited),
     edited TIMESTAMP DEFAULT NOW() NOT NULL CHECK(edited >= created)
     );""")
