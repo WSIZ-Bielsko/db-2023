@@ -38,3 +38,7 @@ class Playlist:
     playlist_owner: UUID
     created: datetime
     edited: datetime
+
+
+class ReplayException(RuntimeError):
+    pass
