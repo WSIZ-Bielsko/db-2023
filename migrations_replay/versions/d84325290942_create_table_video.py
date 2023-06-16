@@ -23,6 +23,7 @@ def upgrade() -> None:
     title TEXT NOT NULL CHECK(title ~ '^[ -~]{1,50}$'),
     owner_id UUID NOT NULL REFERENCES channel(channel_id),
     filename TEXT NOT NULL CHECK(filename ~ '^[ -~]{1,255}$'),
+    file_content BYTEA NOT NULL,
     description TEXT NOT NULL CHECK(title ~ '^[ -~]{1,100}$'),
     created TIMESTAMP DEFAULT NOW() NOT NULL CHECK(created <= edited),
     edited TIMESTAMP DEFAULT NOW() NOT NULL CHECK(edited >= created)
@@ -30,4 +31,4 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.execute('DROP TABLE video;')
+    op.execute('DROP TABLE video CASCADE')

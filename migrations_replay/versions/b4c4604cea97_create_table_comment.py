@@ -30,4 +30,4 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.execute('DROP TABLE comment')
+    op.execute('DROP TABLE comment CASCADE')

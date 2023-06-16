@@ -25,4 +25,4 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.execute('DROP TABLE playlist_video')
+    op.execute('DROP TABLE playlist_video CASCADE')
