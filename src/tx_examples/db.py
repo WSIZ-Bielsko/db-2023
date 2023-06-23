@@ -2,7 +2,7 @@ import asyncio
 import uuid
 from asyncio import run, sleep, create_task
 from datetime import datetime
-from random import randint, random
+from random import randint, random, choice
 
 import asyncpg
 from asyncpg import SerializationError
@@ -65,46 +65,63 @@ class DbService:
                                                 a.id, a.name, a.amount)
         return Account(**dict(row))
 
-    async def update_amount(self, acc: Account, update_id: int):
-        for retry in range(30):
+    async def increment_amount_on_account(self, acc: Account, update_id: int, rollback_all=False):
+        # todo: sprawdzamy działanie tej funkcji
+        for retry in range(50):
             async with self.pool.acquire() as con:
                 try:
                     # other levels: 'read_committed', 'repeatable_read', 'serializable'
-                    async with con.transaction(isolation='repeatable_read') as tx:
+                    async with con.transaction(isolation='serializable') as tx:
                         # get current amount
                         amount = await con.fetchval('select amount from accounts where id=$1', acc.id)
 
                         # just a delay - for testing
                         # await sleep(0.02 + 0.1 * random())
 
+
                         # update the account
                         await con.execute('update accounts set amount=$2 where id=$1', acc.id, amount + 1)
+
+                        if rollback_all:
+                            raise RuntimeError('just a dry run...')
 
                 except asyncpg.exceptions.SerializationError as f:
                     print(f'retry #{retry} by id={update_id}')
                     continue
+                except RuntimeError as e:
+                    print('meh... dry run')
+                    break
                 print(f'update id={update_id} -> to {amount + 1}')
                 break
 
+
 def ts():
     return datetime.now().timestamp()
+
 
 async def main():
     db = DbService()
     await db.initialize()
     account = await db.get_account_by_name('wu')
-    account.amount = 0
-    await db.upsert_account(account)
-    print(account)
+    accounts = await db.get_accounts()
+    for a in accounts:
+        a.amount = 0
+        await db.upsert_account(a)
+
+    # account.amount = 0
+    # await db.upsert_account(account)
+    # print(account)
     t = []
     st = ts()
-    for update_id in range(30):
-        t.append(create_task(db.update_amount(account, update_id)))
-        # await db.update_amount(account, update_id)
+    for update_id in range(50):
+        t.append(create_task(db.increment_amount_on_account(choice(accounts), update_id, rollback_all=True)))
+        # t.append(create_task(db.increment_amount_on_account(account, update_id)))
+        # await db.increment_amount_on_account(account, update_id)
     await asyncio.gather(*t)
     en = ts()
-    print(await db.get_account(account.id))  # amount=100?
-    print(f'full operation duration: {en-st:.3}s')
+    # print(await db.get_account(account.id))  # amount=100?
+    print(await db.get_accounts())
+    print(f'full operation duration: {en - st:.3}s')
 
 
 if __name__ == '__main__':
