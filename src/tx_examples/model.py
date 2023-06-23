@@ -5,9 +5,9 @@ from uuid import UUID, uuid4
 
 @dataclass
 class Account:
-    id: UUID
-    name: str
-    amount: int
+    account_id: UUID
+    account_name: str
+    balance: float
 
 
 if __name__ == '__main__':
