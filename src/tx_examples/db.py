@@ -113,7 +113,7 @@ async def main():
     # print(account)
     t = []
     st = ts()
-    for update_id in range(50):
+    for update_id in range(30):
         t.append(create_task(db.increment_amount_on_account(choice(accounts), update_id, rollback_all=True)))
         # t.append(create_task(db.increment_amount_on_account(account, update_id)))
         # await db.increment_amount_on_account(account, update_id)
