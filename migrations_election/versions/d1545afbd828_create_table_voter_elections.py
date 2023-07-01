@@ -18,8 +18,8 @@ depends_on = None
 
 def upgrade() -> None:
     op.execute("""CREATE TABLE voter_elections(
-        election_id UUID NOT NULL REFERENCES election(election_id),
-        voter_id UUID NOT NULL REFERENCES voter(voter_id),
+        election_id UUID NOT NULL REFERENCES election ON DELETE CASCADE,
+        voter_id UUID NOT NULL REFERENCES voter ON DELETE CASCADE,
         UNIQUE (election_id, voter_id)
     );""")
 

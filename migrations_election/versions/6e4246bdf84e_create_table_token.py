@@ -19,7 +19,7 @@ depends_on = None
 def upgrade() -> None:
     op.execute("""CREATE TABLE token(
         token_id UUID DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
-        election_id UUID NOT NULL REFERENCES election(election_id)
+        election_id UUID NOT NULL REFERENCES election ON DELETE CASCADE
     );""")
 
 

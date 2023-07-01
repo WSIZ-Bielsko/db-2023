@@ -19,8 +19,8 @@ depends_on = None
 def upgrade() -> None:
     op.execute("""CREATE TABLE election(
         election_id UUID DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
-        type_id UUID NOT NULL REFERENCES election_type(type_id),
-        region_id UUID NOT NULL REFERENCES region(region_id),
+        type_id UUID NOT NULL REFERENCES election_type ON DELETE CASCADE,
+        region_id UUID NOT NULL REFERENCES region ON DELETE CASCADE,
         vote_start TIMESTAMP NOT NULL DEFAULT NOW(),
         vote_end TIMESTAMP NOT NULL DEFAULT NOW()
     );""")
