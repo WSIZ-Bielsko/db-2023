@@ -32,7 +32,9 @@ class DbService:
         values = (user.uid, user.name)
         async with self.pool.acquire() as connection:
             result = await connection.fetchrow(query, *values)
-        return User(*result)
+        res = User(*result)
+        print(f'Created election: {res}')
+        return res
 
     async def delete_user(self, uid: uuid):
         query = """
@@ -40,6 +42,7 @@ class DbService:
            """
         async with self.pool.acquire() as connection:
             await connection.execute(query, uid)
+            print(f'Removed user {uid}')
 
     async def create_election(self, election: Election) -> Election:
         query = """
@@ -48,7 +51,9 @@ class DbService:
         values = (election.eid, election.name)
         async with self.pool.acquire() as connection:
             result = await connection.fetchrow(query, *values)
-        return Election(*result)
+        res = Election(*result)
+        print(f'Created election: {res}')
+        return res
 
     async def delete_election(self, eid: uuid):
         query = """
@@ -56,6 +61,7 @@ class DbService:
            """
         async with self.pool.acquire() as connection:
             await connection.execute(query, eid)
+            print(f'Removed election {eid}')
 
 
     async def register_for_election(self, eid: uuid, uid: uuid) -> uuid:
@@ -67,8 +73,9 @@ class DbService:
 
         :param eid:
         :param uid:
-        :return:
+        :return: token for the election
         """
+        pass
 
     async def vote(self, tokenid: uuid, votevalue: int) -> uuid:
         """
@@ -82,6 +89,7 @@ class DbService:
         :raises: VotingError if tokenid is invalid
         :return:
         """
+        pass
 
 
 def ts():
