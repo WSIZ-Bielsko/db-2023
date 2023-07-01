@@ -26,16 +26,36 @@ class DbService:
         print(f'connected to [{URL}]')
 
     async def create_user(self, user: User) -> User:
-        pass
+        query = """
+               INSERT INTO users (uid, name) VALUES ($1, $2) RETURNING *
+           """
+        values = (user.uid, user.name)
+        async with self.pool.acquire() as connection:
+            result = await connection.fetchrow(query, *values)
+        return User(*result)
 
     async def delete_user(self, uid: uuid):
-        pass
+        query = """
+               DELETE FROM users WHERE uid = $1
+           """
+        async with self.pool.acquire() as connection:
+            await connection.execute(query, uid)
 
-    async def create_election(self, user: User) -> User:
-        pass
+    async def create_election(self, election: Election) -> Election:
+        query = """
+               INSERT INTO elections (eid, name) VALUES ($1, $2) RETURNING *
+           """
+        values = (election.eid, election.name)
+        async with self.pool.acquire() as connection:
+            result = await connection.fetchrow(query, *values)
+        return Election(*result)
 
     async def delete_election(self, eid: uuid):
-        pass
+        query = """
+               DELETE FROM elections WHERE eid = $1
+           """
+        async with self.pool.acquire() as connection:
+            await connection.execute(query, eid)
 
 
     async def register_for_election(self, eid: uuid, uid: uuid) -> uuid:
@@ -71,6 +91,14 @@ def ts():
 async def main():
     db = DbService()
     await db.initialize()
+    uid = uuid4()
+    user = await db.create_user(User(uid, 'xi'))
+    await db.delete_user(user.uid)
+
+    elect = await db.create_election(Election(uid, 'Wybory normalne'))
+    await db.delete_election(elect.eid)
+
+
 
 
 if __name__ == '__main__':
