@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from uuid import UUID, uuid4
+from uuid import UUID
+
 
 
 @dataclass

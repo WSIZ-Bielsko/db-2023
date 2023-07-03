@@ -1,9 +1,8 @@
-import asyncio
 import uuid
-from asyncio import run, create_task
+from asyncio import run
 from datetime import datetime
 from os import getenv
-from random import choice
+from uuid import uuid4
 
 import asyncpg
 from dotenv import load_dotenv
@@ -13,8 +12,6 @@ from model import *
 load_dotenv()
 URL = getenv('DATABASE_URL')
 SCHEMA = getenv('SCHEMA')
-
-
 
 
 class DbService:
@@ -63,8 +60,13 @@ class DbService:
             await connection.execute(query, eid)
             print(f'Removed election {eid}')
 
+    async def get_all_votes(self, eid: uuid) -> list[Vote]:
+        async with self.pool.acquire() as c:
+            votes = await c.fetch('select * from votes where eid=$1 order by votevalue', eid)
+            votes = [Vote(*t) for t in votes]
+            return votes
 
-    async def register_for_election(self, eid: uuid, uid: uuid) -> uuid:
+    async def register_for_election(self, eid: uuid, uid: uuid) -> Token:
         """
         User with `uid` registers for election `eid`; raises VotingError if already voted, or
         `uid` or `eid` are invalid.
@@ -75,7 +77,26 @@ class DbService:
         :param uid:
         :return: token for the election
         """
-        pass
+
+        async with self.pool.acquire() as con:
+            try:
+                async with con.transaction(isolation='serializable') as tx:
+                    # create new token
+                    res = await con.fetchrow('insert into tokens(eid) values ($1) returning *', eid)
+                    token = Token(*res)
+                    await con.execute('insert into participation(eid,uid) values ($1,$2)', eid, uid)
+                print(f'generated token: {str(token.tokenid)[:6]}...')
+                return token
+
+            except asyncpg.exceptions.SerializationError as f:
+                print(f'serialization error for {eid=}, {uid=}')
+
+            except asyncpg.exceptions.UniqueViolationError as f:
+                print('repeated key')
+                raise VotingError(f'repeated registration for {uid=}, {eid=}')
+
+            except RuntimeError as e:
+                print(f'runtime error error for {eid=}, {uid=}')
 
     async def vote(self, tokenid: uuid, votevalue: int) -> uuid:
         """
@@ -89,7 +110,50 @@ class DbService:
         :raises: VotingError if tokenid is invalid
         :return:
         """
-        pass
+        async with self.pool.acquire() as con:
+            try:
+                async with con.transaction(isolation='serializable') as tx:
+                    # create new token
+                    res = await con.fetchrow('select * from tokens where tokenid=$1', tokenid)
+                    if res is None:
+                        raise VotingError('invalid token')
+
+                    token = Token(*res)
+                    await con.execute('delete from tokens where tokenid=$1', tokenid)
+
+                    await con.execute('insert into votes(eid, votevalue) values ($1,$2)', token.eid, votevalue)
+
+                print(f'token {str(token.tokenid)}... voted in election: {token.eid}')
+                return tokenid
+
+            except asyncpg.exceptions.SerializationError as f:
+                print(f'serialization error for {tokenid=}')
+                raise VotingError(f'concurrent acces for {tokenid=}')
+
+            except RuntimeError as e:
+                print(f'runtime error for {tokenid=}, error: {e}')
+                raise VotingError(f'error voting with {tokenid=}, e')
+
+    async def test_cleanup(self):
+        """
+        Test-only method.
+        """
+        query = """
+               DELETE FROM elections WHERE true;
+               DELETE FROM users WHERE true;
+           """
+        async with self.pool.acquire() as connection:
+            await connection.execute(query)
+            print(f'Removed all users and elections')
+
+    async def test_get_all_tokens(self):
+        """
+        Test-only method.
+        """
+        async with self.pool.acquire() as c:
+            tokens = await c.fetch('select * from tokens order by eid,tokenid')
+            tokens = [Token(*t) for t in tokens]
+            return tokens
 
 
 def ts():
@@ -97,16 +161,15 @@ def ts():
 
 
 async def main():
-    db = DbService()
-    await db.initialize()
-    uid = uuid4()
-    user = await db.create_user(User(uid, 'xi'))
-    await db.delete_user(user.uid)
-
-    elect = await db.create_election(Election(uid, 'Wybory normalne'))
-    await db.delete_election(elect.eid)
-
-
+    # db = DbService()
+    # await db.initialize()
+    # uid = uuid4()
+    # user = await db.create_user(User(uid, 'xi'))
+    # await db.delete_user(user.uid)
+    #
+    # elect = await db.create_election(Election(uid, 'Wybory normalne'))
+    # await db.delete_election(elect.eid)
+    pass
 
 
 if __name__ == '__main__':

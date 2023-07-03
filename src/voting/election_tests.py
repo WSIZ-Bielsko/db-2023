@@ -1,5 +1,5 @@
 import unittest
-from asyncio import gather
+from asyncio import gather, create_task
 from unittest import IsolatedAsyncioTestCase
 from db import *
 
@@ -15,17 +15,39 @@ class Test(IsolatedAsyncioTestCase):
         await self.db.initialize()
 
     async def asyncTearDown(self):
-        print('teardown')
+        await self.db.test_cleanup()
 
     async def test_can_create_user(self):
         user = await self.db.create_user(User(self.uid1, 'xi'))
-        await self.db.delete_user(user.uid)
 
-    # todo: dodać test tworzący i usuwający election
+    async def test_can_create_election(self):
+        election = await self.db.create_election(Election(self.eid1, 'e1'))
 
-    # todo:  dodać test w którym user z uid1 rejestruje się do wyborów eid1, czyli test do db.register_for_election
+    async def test_can_register_for_election(self):
+        u = await self.db.create_user(User(self.uid1, 'xi'))
+        e = await self.db.create_election(Election(self.eid1, 'e1'))
+
+        token = (await self.db.register_for_election(e.eid, u.uid)).tokenid
+        tokens = await self.db.test_get_all_tokens()
+        tokens = [t.tokenid for t in tokens]
+
+        self.assertIsNotNone(token)
+        self.assertTrue(token in tokens)
+
+    async def test_can_vote_in_election(self):
+        u = await self.db.create_user(User(self.uid1, 'xi'))
+        e = await self.db.create_election(Election(self.eid1, 'e1'))
+
+        token = (await self.db.register_for_election(e.eid, u.uid)).tokenid
+        await self.db.vote(token, 17)
+        votes = await self.db.get_all_votes(e.eid)
+
+        self.assertEqual(len(votes), 1)
 
     async def test_cannot_get_many_tokens_for_user(self):
+        u = await self.db.create_user(User(self.uid1, 'xi'))
+        e = await self.db.create_election(Election(self.eid1, 'e1'))
+
         tasks = []
         N = 30
         errors = 0
@@ -37,22 +59,25 @@ class Test(IsolatedAsyncioTestCase):
             try:
                 # no error
                 g = await t
-                tokens.add(g)
+                tokens.add(g.tokenid)
             except VotingError as e:
                 # error
                 errors += 1
 
-        self.assertEquals(errors, N - 1)
-        self.assertEquals(len(tokens), 1)
+        self.assertEqual(errors, N - 1)
+        self.assertEqual(len(tokens), 1)
 
     async def test_token_can_vote_exactly_once(self):
+        u = await self.db.create_user(User(self.uid1, 'xi'))
+        e = await self.db.create_election(Election(self.eid1, 'e1'))
+
         N = 30
 
         token = await self.db.register_for_election(self.eid1, self.uid1)
 
         tasks = []
         for i in range(N):
-            tasks.append(create_task(self.db.vote(token, 3)))
+            tasks.append(create_task(self.db.vote(token.tokenid, 3)))
 
         errors = 0
         for t in tasks:
@@ -63,7 +88,10 @@ class Test(IsolatedAsyncioTestCase):
                 # error
                 errors += 1
 
-        self.assertEquals(errors, N - 1)
+        votes = await self.db.get_all_votes(self.eid1)
+
+        self.assertEqual(errors, N - 1)
+        self.assertEqual(len(votes), 1)
 
         # assert exactly one vote in table votes
         # assert len(self.db.get_votes_by_eid(self.eid1)) == 1

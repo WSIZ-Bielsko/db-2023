@@ -22,9 +22,12 @@ create table tokens(
 );
 
 create table votes(
-    eid uuid not null references elections on delete cascade,
+    eid uuid not null references elections(eid) on delete cascade,
     votevalue int not null
 );
+
+alter table participation add unique (eid, uid);
+
 
 drop table participation;
 drop table votes;
