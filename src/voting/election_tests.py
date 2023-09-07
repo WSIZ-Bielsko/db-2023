@@ -49,7 +49,7 @@ class Test(IsolatedAsyncioTestCase):
         e = await self.db.create_election(Election(self.eid1, 'e1'))
 
         tasks = []
-        N = 30
+        N = 300
         errors = 0
         for i in range(N):
             tasks.append(create_task(self.db.register_for_election(self.eid1, self.uid1)))
