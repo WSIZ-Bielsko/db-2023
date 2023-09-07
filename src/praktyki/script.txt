@@ -1,0 +1,1 @@
+DELETE FROM persons WHERE person_id != '232127a2-7b68-47b8-8079-09cb0411870f';
