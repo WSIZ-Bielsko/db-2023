@@ -25,3 +25,5 @@ add filename to fagreement              e3031b716ab5
 remove not null on person.password      56891f97bbab
 update curriculum_vitae add not null filename 0e841de7ac41
 add application.created_at              ffafefc9a15e
+add_missing_foreign_keys                cbdb588eec9a
+adding_constraints                      a71bb8772f7a
