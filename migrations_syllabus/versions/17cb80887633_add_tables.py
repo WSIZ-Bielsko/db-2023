@@ -33,7 +33,7 @@ def upgrade() -> None:
         semester_id UUID DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
         semester_name TEXT UNIQUE,
         semester_start DATE DEFAULT NOW(),
-        semester_end DATE DEFAULT NOW() CHECK (semester_end > semester_start)
+        semester_end DATE DEFAULT NOW() CHECK (semester_end >= semester_start)
     );
     
     CREATE TABLE syllabus(
