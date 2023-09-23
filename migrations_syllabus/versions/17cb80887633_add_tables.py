@@ -33,7 +33,7 @@ def upgrade() -> None:
         semester_id UUID DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
         semester_name TEXT UNIQUE,
         semester_start DATE DEFAULT NOW(),
-        semester_end DATE DEFAULT NOW() CHECK (semester_end > semester_start)
+        semester_end DATE DEFAULT NOW() CHECK (semester_end >= semester_start)
     );
     
     CREATE TABLE syllabus(
@@ -45,9 +45,10 @@ def upgrade() -> None:
     
     CREATE TABLE lecture_content(
         content_id UUID DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
-        order_number SERIAL,
+        order_number INT,
         syllabus_id UUID REFERENCES syllabus(syllabus_id) ON DELETE CASCADE,
-        lecture_topic TEXT NOT NULL
+        lecture_topic TEXT NOT NULL,
+        UNIQUE (order_number, syllabus_id)
     );
     """)
 
