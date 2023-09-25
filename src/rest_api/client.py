@@ -1,7 +1,6 @@
 from dataclasses import dataclass
-
-import aiohttp
-import asyncio
+from aiohttp import ClientSession
+from asyncio import get_event_loop
 
 
 # https://docs.aiohttp.org/en/stable/client_quickstart.html
@@ -12,7 +11,7 @@ class MyResponse:
 
 
 async def main():
-    async with aiohttp.ClientSession() as session:
+    async with ClientSession() as session:
         async with session.get('http://localhost:4000/welcome') as resp:
             print(resp.status)
             print(await resp.text())
@@ -20,5 +19,5 @@ async def main():
             print(MyResponse(**d))  # tu tworzymy instancję klasy MyResponse
 
 
-loop = asyncio.get_event_loop()
+loop = get_event_loop()
 loop.run_until_complete(main())

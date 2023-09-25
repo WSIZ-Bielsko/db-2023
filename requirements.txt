@@ -1,6 +1,10 @@
-alembic
-python-dotenv
+alembic>=1.11.3
+python-dotenv>=1.0.0
 psycopg2-binary
-loguru
-asyncpg
-pandas
+loguru>=0.7.1
+asyncpg>=0.28.0
+pandas>=2.1.0
+pydantic>=2.3.0
+aiosqlite>=0.19.0
+SQLAlchemy>=2.0.20
+aiohttp>=3.8.5
